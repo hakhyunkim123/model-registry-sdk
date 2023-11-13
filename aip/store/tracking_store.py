@@ -63,6 +63,10 @@ def search_experiments(filter_string: Optional[str] = None) -> List[Experiment]:
     return _tracking_service.search_experiments(filter_string=filter_string)
 
 
+def list_artifacts(run_id: str, path: Optional[str] = None) -> List[str]:
+    return _tracking_service.list_artifacts(run_id, path)
+
+
 # def search_experiments(
 #         view_type: int = ACTIVE_ONLY,
 #         max_results: int = 1000,
@@ -134,11 +138,13 @@ def update_experiment(experiment_id: str, new_name: str) -> None:
 def create_run(
         experiment_id: str,
         run_name: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         tags: Optional[Dict[str, Any]] = None,
 
 ) -> Run:
     """
     Create run
+    :param metadata:
     :param experiment_id: experiment id for create run
     :param run_name: run name (unique)
     :param start_time: start time of run
@@ -153,7 +159,7 @@ def create_run(
     # )
     # if len(runs) > 0:
     #     raise FileExistsError(f"{run_name} in {experiment_id} is existed")
-    return _tracking_service.create_run(experiment_id, run_name, tags)
+    return _tracking_service.create_run(experiment_id=experiment_id, run_name=run_name, tags=tags, metadata=metadata)
 
 
 def get_run(run_id: str) -> Run:
@@ -182,17 +188,7 @@ def get_run_detail(run_id: str, artifact_files: Optional[List[str]] = None) -> R
     :param run_id: run id
     :return: Run
     """
-    if artifact_files is None:
-        artifact_files = ["config", "model_info"]
     run = _tracking_service.get_run_detail(run_id, artifact_files)
-    # artifact_uri = run.info.artifact_uri
-    # run_dict = run.model_dump()
-    # del run
-    # if artifact_files is not None:
-    #     run_dict['artifact_data'] = dict()
-    #     for artifact_file in artifact_files:
-    #         data = _tracking_service.load_dict(f"{artifact_uri}/{artifact_file}.json")
-    #         run_dict['artifact_data'][artifact_file] = data
 
     return run
 
@@ -230,7 +226,7 @@ def search_run(
 #     return _tracking_service.search_run(experiment_ids, filter_string, run_view_type, max_results, order_by, page_token)
 
 
-def get_run_by_name(experiment_id: str, run_name: str) -> Optional[Run]:
+def get_run_by_name(experiment_id: str, run_name: str, detail: bool = False) -> Optional[Run]:
     """
     Get run by run id
     :param experiment_id: experiment_id
@@ -240,7 +236,10 @@ def get_run_by_name(experiment_id: str, run_name: str) -> Optional[Run]:
     runs = search_run(experiment_id=experiment_id, filter_string=f"run_name = '{run_name}'")
     if len(runs) == 0:
         return None
-    return runs[-1]
+    run = runs[-1]
+    if detail:
+        run = get_run_detail(run.info.run_id)
+    return run
 
 
 # def update_run(
@@ -363,7 +362,9 @@ def log_model_metadata(
 
 
 def terminate(run_id: str, status: str,
-              end_time: Optional[int] = get_current_time_millis(), experiment_id: str = None) -> None:
+              end_time: Optional[int] = None, experiment_id: str = None) -> None:
+    if end_time is None:
+        end_time = get_current_time_millis()
     _tracking_service.terminate(run_id, status, end_time, experiment_id)
 
 

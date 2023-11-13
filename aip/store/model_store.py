@@ -1,8 +1,7 @@
 from typing import Optional, List, Dict, Any, Tuple
 
 import aip._internal._model_regisry_service as model_registry_service
-from aip._internal._tracking_service import get_run
-
+from aip.entities.model_info import TrainingModelInfo, ModelInfo
 from aip.entities.model import RegisteredModel
 from aip.entities.model_version import ModelVersion
 from aip.exceptions import APIException
@@ -100,14 +99,16 @@ def _get_model_version_detail(name: str, version: str, json_files: Optional[List
     return model_registry_service.get_model_version_detail(name, version, json_files)
 
 
-def get_model_version_detail(name: str, version: str) -> ModelVersion:
+def get_model_version_detail(name: str, version: str) -> ModelInfo:
     model_version = model_registry_service.get_model_version_detail(name, version)
-    from aip.entities.model_info import TrainingModelInfo, ModelInfo
-    from aip.store.tracking_store import load_dict
-    config = load_dict(model_version.run_id, 'config.json')
-    model_info = load_dict(model_version.run_id, 'model_info.json')
 
-    model_info = TrainingModelInfo(**model_info)
+    from aip.store.tracking_store import load_dict
+    # config = load_dict(model_version.run_id, 'config.json')
+    # model_info = load_dict(model_version.run_id, 'model_info.json')
+    metadata = model_version.run.metadata
+
+    model_info = TrainingModelInfo(**metadata.get("model_info")) if "model_info" in metadata else None
+    config = metadata.get("config") if "config" in metadata else None
     result = {
         "id": model_info.id,
         "name": model_info.name,
@@ -120,9 +121,7 @@ def get_model_version_detail(name: str, version: str) -> ModelVersion:
         }
     }
 
-    print(ModelInfo(**result))
-
-    return model_version
+    return ModelInfo(**result)
 
 
 def search_model_versions(filter_string: Optional[str] = None) -> List[ModelVersion]:

@@ -5,7 +5,7 @@ from aip.entities.run import Run, RunInfo, RunData
 from aip.entities.experiment import Experiment
 from aip.exceptions import APIException
 from aip.constants import EXPERIMENT_DOMAIN, RUN_DOMAIN, ACTIVE_ONLY, ALL
-from aip.utils.timeutils import get_current_time_millis
+from aip.utils.timeutils import get_current_time_millis, conv_longdate_to_str
 from aip.auth import AuthConfig
 
 
@@ -149,6 +149,7 @@ def create_run(
         run_name: str,
         # start_time: Optional[int] = get_current_time_millis(),
         tags: Optional[Dict[str, Any]] = None,
+        metadata: Optional[Dict[str, Any]] = None
 
 ) -> Run:
     url = f"{RUN_DOMAIN}"
@@ -160,6 +161,8 @@ def create_run(
     #     data['start_time'] = start_time
     if tags is not None:
         data['tags'] = tags
+    if metadata is not None:
+        data['metadata'] = metadata
 
     response = requests.put(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
 
@@ -169,11 +172,12 @@ def create_run(
         return Run(**response.json().get("run"))
 
 
-def get_run(run_id: str) -> Run:
+def get_run(run_id: str, detail: bool = False) -> Run:
     url = f"{RUN_DOMAIN}"
 
     params = dict()
     params['run_id'] = run_id
+    params['detail'] = detail
 
     response = requests.get(url, params=params, auth=(AuthConfig().username, AuthConfig().password))
 
@@ -219,6 +223,22 @@ def search_run(
     else:
         runs = response.json().get("runs", [])
         return [Run(**run) for run in runs]
+
+
+def list_artifacts(run_id: str, path: Optional[str] = None) -> List[str]:
+    url = f"{RUN_DOMAIN}/artifacts/list"
+
+    params = dict()
+    params['run_id'] = run_id
+    if path is not None:
+        params['path'] = path
+
+    response = requests.get(url, params=params, auth=(AuthConfig().username, AuthConfig().password))
+
+    if response.status_code != 200:
+        raise APIException(response)
+    else:
+        return response.json().get("files")
 
 
 def set_tag(run_id: str, key: str, value: str, experiment_id: Optional[str] = None) -> None:
@@ -415,15 +435,14 @@ def log_model_metadata(
         raise APIException(response)
 
 
-def terminate(run_id: str, status: str,
-              end_time: Optional[int] = get_current_time_millis(), experiment_id: str = None) -> None:
+def terminate(run_id: str, status: str, end_time: Optional[int] = None, experiment_id: str = None) -> None:
     url = f"{RUN_DOMAIN}/terminate"
+    end_time = get_current_time_millis() if end_time is None else end_time
 
     data = dict()
     data['run_id'] = run_id
     data['run_status'] = status
-    if end_time is not None:
-        data['end_time'] = end_time
+    data['end_time'] = end_time
     if experiment_id is not None:
         data['experiment_id'] = experiment_id
 

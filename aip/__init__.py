@@ -24,8 +24,13 @@ def create_tracker(
 ):
     if tracker_type == "SACP":
         return Tracker(
+            tracker_type=tracker_type,
             configs=configs,
             model_info=model_info
         )
+
+
+def load_tracker(run_id: str):
+    return Tracker.load(run_id)
 
 

@@ -1,5 +1,6 @@
 id: "P000001"
 name: "고객 알뜰 지수 모델"
+description: "고객 알뜰 지수 모델 입니다."
 version:
 pdi_tag: "D"
 category: "상품단위"

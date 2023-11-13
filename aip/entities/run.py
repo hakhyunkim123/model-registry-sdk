@@ -23,8 +23,9 @@ class RunData(BaseModel):
 class Run(BaseModel):
     info: RunInfo = Field(default=None, alias="info")
     data: RunData = Field(default=None, alias="data")
-    artifact_data: Optional[Dict[str, Any]] = Field(default={})
+    metadata: Optional[Dict[str, Any]] = Field(default={})
     logged_model: Optional[Dict] = Field(default={})
+    artifact_data: Optional[Dict[str, Any]] = Field(default={})
 
     class Config:
         arbitrary_types_allowed = True

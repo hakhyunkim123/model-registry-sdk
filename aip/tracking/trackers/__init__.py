@@ -17,19 +17,25 @@ from aip.auth import AuthConfig
 
 
 class Tracker:
+    _type: str
     _run: Optional[Run] = None
     _experiment: Optional[Experiment] = None
     _configs: Optional[Dict[str, Any]] = None
     _model_info: Optional[TrainingModelInfo] = None
-    # _auth_config: AuthConfig
 
     def __init__(
             self,
+            tracker_type: str,
             configs: Optional[Dict[str, Any]] = None,
             model_info: Optional[Dict[str, Any]] = None
     ):
+        self._type = tracker_type
         self._configs = configs
-        self._model_info = TrainingModelInfo(**model_info)
+        self._model_info = TrainingModelInfo(**model_info) if model_info is not None else None
+
+    @property
+    def type(self):
+        return self._type
 
     @property
     def experiment(self):
@@ -40,41 +46,71 @@ class Tracker:
         return self._run
 
     @property
-    def configs(self):
+    def configs(self) -> Dict[str, Any]:
         return self._configs
 
     @property
-    def model_info(self):
+    def model_info(self) -> TrainingModelInfo:
         return self._model_info
+
+    @model_info.setter
+    def model_info(self, model_info):
+        self._model_info = model_info
+
+    @configs.setter
+    def configs(self, configs):
+        self._configs = configs
+
+    @classmethod
+    def load(cls, run_id: str):
+        run = tracking_store.get_run_detail(run_id)
+        model_info = run.metadata.get("model_info", None)
+        config = run.metadata.get("config", None)
+        loaded_tracker = cls(
+            tracker_type=run.data.tags.get("type"),
+            model_info=model_info,
+            configs=config
+        )
+        loaded_tracker.set_experiment(tracking_store.get_experiment(run.info.experiment_id).name)
+        loaded_tracker.start_run(run.info.run_name)
+
+        return loaded_tracker
 
     def set_experiment(self, experiment_name: str, tags: Optional[Dict[str, Any]] = None) -> Experiment:
         experiment = tracking_store.get_experiment_by_name(experiment_name)
         if experiment is None:
+            if tags is None:
+                tags = {}
+            tags['type'] = self._type
             experiment = tracking_store.create_experiment(name=experiment_name, tags=tags)
 
         self._experiment = experiment
 
         return self._experiment
 
-    def start_run(self, run_name: str, run_tags: Optional[Dict[str, Any]] = None) -> Run:
-        run = tracking_store.get_run_by_name(self._experiment.experiment_id, run_name)
+    def start_run(self, run_name: Optional[str] = None, run_tags: Optional[Dict[str, Any]] = None) -> Run:
+        run = tracking_store.get_run_by_name(self._experiment.experiment_id, run_name, detail=True)
         if run is None:
+            if run_tags is None:
+                run_tags = {}
+            run_tags['type'] = self._type
+
+            metadata = dict()
+            if self._configs is not None:
+                metadata['config'] = self._configs
+            if self._model_info is not None:
+                metadata['model_info'] = self._model_info.model_dump()
+
             run = tracking_store.create_run(
                 experiment_id=self._experiment.experiment_id,
                 run_name=run_name,
-                tags=run_tags
+                tags=run_tags,
+                metadata=metadata
             )
-            if self._configs is not None:
-                tracking_store.log_dict(run.run_id, self._configs, "config.json")
-            if self._model_info is not None:
-                tracking_store.log_dict(run.run_id, self._model_info.model_dump(), "model_info.json")
-        else:
-            self._configs = tracking_store.load_dict(run.info.run_id, artifact_path="config.json")
-            model_info = tracking_store.load_dict(run.info.run_id, artifact_path="model_info.json")
-            self._model_info = TrainingModelInfo(**model_info)
+
+            # run = run.model_copy(update={"metadata": metadata})
 
         self._run = run
-
         return self._run
 
     def set_tag(self, key: str, value: str):
@@ -105,21 +141,28 @@ class Tracker:
         )
 
         model_tags = {
+            "type": self._type,
+            "name": self._model_info.name,
             "model_code": self._model_info.id,
-            "pdi_tag": self.model_info.pdi_tag,
+            "pdi_tag": self._model_info.pdi_tag,
             "category": self._model_info.category,
             "target": self._model_info.target,
             "algorithm": self._model_info.algorithm
         }
 
-        registered_model = model_store.get_registered_model(name=self._model_info.name)
+        registered_model = model_store.get_registered_model(name=self._model_info.id)
         if registered_model is None:
-            registered_model = model_store.create_registered_model(name=self._model_info.name, tags=model_tags)
+            registered_model = model_store.create_registered_model(
+                name=self._model_info.id,
+                tags=model_tags,
+                description=self._model_info.description
+            )
 
         model_version = model_store.create_model_version(
             name=registered_model.name,
             run_id=self._run.info.run_id,
-            tags=model_tags
+            tags=model_tags,
+            description=self._model_info.description
         )
 
         return model_version

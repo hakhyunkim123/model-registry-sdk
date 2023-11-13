@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
 
 # from aip.entities.metric import
@@ -7,7 +7,7 @@ from typing import Optional, List, Dict, Any
 class TrainingModelInfo(BaseModel):
     id: str = Field(description="P000001")
     name: str = Field(description="고객 알뜰 지수")
-    version: Optional[str] = Field(default=None, description="고객 알뜰 지수 입니다.")
+    description: Optional[str] = Field(default=None, description="고객 알뜰 지수 입니다.")
     pdi_tag: str = Field(description="D")
     category: str = Field(description="상품단위")
     target: str = Field(description="신규")
@@ -23,6 +23,9 @@ class TrainingModelInfo(BaseModel):
 
 
 class TrainingInfo(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=()
+    )
     model_info: TrainingModelInfo
     model_target_query: Optional[str] = Field(default=None)
 

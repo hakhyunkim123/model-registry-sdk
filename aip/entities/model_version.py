@@ -1,9 +1,13 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List, Dict, Any
 from aip.entities.run import Run
 
 
 class ModelVersion(BaseModel):
+    model_config = ConfigDict(
+        protected_namespaces=()
+    )
+
     model_uuid: Optional[str] = Field(default=None)
     name: str
     version: str

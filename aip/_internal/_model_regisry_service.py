@@ -201,12 +201,13 @@ def create_model_version(
         return ModelVersion(**response.json().get("model_version"))
 
 
-def get_model_version(name: str, version: str) -> ModelVersion:
+def get_model_version(name: str, version: str, detail: bool = False) -> ModelVersion:
     url = f"{MODEL_VERSION_DOMAIN}"
 
     params = dict()
     params["name"] = name
     params["version"] = version
+    params["detail"] = detail
 
     response = requests.get(url, params=params, auth=(AuthConfig().username, AuthConfig().password))
 

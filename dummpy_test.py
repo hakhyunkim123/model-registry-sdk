@@ -41,11 +41,13 @@ def final():
         "task_type": "NOTEBOOK",
         "task_id": "1234",
     }
-    tracker.start_run(run_name="ncai_base_model", run_tags=run_tags)
+    tracker.start_run(run_name="test3", run_tags=run_tags)
 
     tracker.log_params(params)
     tracker.log_metrics(metrics)
-    tracker.log_model_metadata()
+    # print(tracker.model_info)
+    # tracker.log_model_metadata()
+    # print(tracker.run.metadata)
 
     tracker.end()
 
@@ -59,64 +61,13 @@ def get_model_version():
     aip.get_model_version_detail(name=name, version="3")
 
 
-get_model_version()
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-# # tracker = aip.create_tracker(configs=configs, model_info=model_info)
-# # tracker.set_experiment(experiment_name="ftest-01")
-# # # print(tracker.experiment)
-# # run = tracker.start_run(run_name="test", run_tags={"type": "NCAI"})
-# # tracker.log_params(params)
-# # tracker.log_metrics(metrics)
-# # tracker.set_tag(key="test", value="test2")
-# # tracker.log_model_metadata()
-# # tracker.end()
-# from pprint import pprint
-# pprint(aip.get_run_detail(run_id="76777c7f27e649edbfe6dca97492e97e").model_dump(), sort_dicts=False)
-# # print(run)
-#
-# # tracker = aip.create_tracker(tracker_type="SACP", experiment_name="auth-test", configs=configs, model_info=model_info)
-# # tracker.start_run(run_name="sdk-test-01")
-# # tracker.log_param("n_threads", "10")
-# # tracker.log_metric("l5", 1.5)
-# # # tracker.log_model()
-# # tracker.refresh_run()
-# # # print(tracker.run)
-# # tracker.end()
-#
-# # tracker = aip.create_tracker(tracker_type="SACP", experiment_name="sdk-test", configs=configs, model_info=model_info)
-# # tracker.start_run(run_name="sdk-test-01")
-# # tracker.log_param("n_threads", "10")
-# # tracker.log_metric("l5", 1.5)
-# # # tracker.log_model()
-# # tracker.refresh_run()
-# # # print(tracker.run)
-# # tracker.end()
-# # from pprint import pprint
-# # r = aip.get_run("7defd911d22f49ad80a27f30de124081", ["config", "model_info"])
-# # r = aip.get_run("7defd911d22f49ad80a27f30de124081")
-# # pprint(r.model_dump(), sort_dicts=False)
-# # mv = aip.get_model_version(name="test", version="2")
-# # from mlflow.client import MlflowClient
-# # mc = MlflowClient("http://localhost:5000")
-# # exp = mc.get_experiment_by_name("sdk-test")
-# # run = mc.get_run("7defd911d22f49ad80a27f30de124081")
-# # print(run)
-# # mc.create_run(exp.experiment_id, run_name="run1", sour)
-#
-#
-# # import mlflow
-# # mlflow.log_params()
-# # mlflow.log_metrics()
-# import aip.store.model_store
-#
-# print(aip.store.model_store.search_registered_models(filter_string="name='ai-test23'"))
-# print(aip.store.model_store.get_registered_model("ai-test23"))
+def load():
+    tracker = aip.load_tracker(run_id="34499753774e454c8177ebc38ff886ba")
+    tracker.log_model_metadata()
+# get_model_version()
+# final()
+# load()
+
+# print(aip.get_registered_model(name="P000001"))
+from pprint import pprint
+pprint(aip.get_model_version_detail(name="P000001", version="1").model_dump(), sort_dicts=False)

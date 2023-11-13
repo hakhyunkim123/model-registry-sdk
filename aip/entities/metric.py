@@ -7,7 +7,7 @@ class Metric(BaseModel):
     key: str
     value: float
     timestamp: Optional[int] = Field(default=None)
-    step: Optional[int] = Field(default=get_current_time_millis())
+    step: Optional[int] = Field(default=0)
 
 
 class NCAIMetric(BaseModel):
