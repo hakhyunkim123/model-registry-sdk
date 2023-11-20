@@ -1,7 +1,7 @@
 from typing import Optional, List, Dict, Any, Tuple
 
 import aip._internal._model_regisry_service as model_registry_service
-from aip.entities.model_info import TrainingModelInfo, ModelInfo
+from aip.entities.model_info import ModelInfo
 from aip.entities.model import RegisteredModel
 from aip.entities.model_version import ModelVersion
 from aip.exceptions import APIException
@@ -80,51 +80,46 @@ def create_model_version(
         tags: Optional[Dict[str, Any]] = None,
         # run_link: Optional[str] = None,
         description: Optional[str] = None
-) -> ModelVersion:
+) -> ModelInfo:
     return model_registry_service.create_model_version(
         name=name,
         source=source,
         run_id=run_id,
         tags=tags,
-        # run_link,
         description=description
     )
 
 
-def get_model_version(name: str, version: str) -> ModelVersion:
-    return model_registry_service.get_model_version(name, version)
+def get_model_version(name: str, version: str, detail: bool = False) -> ModelInfo:
+    return model_registry_service.get_model_version(name, version, detail)
 
 
-def _get_model_version_detail(name: str, version: str, json_files: Optional[List[str]] = None) -> ModelVersion:
-    return model_registry_service.get_model_version_detail(name, version, json_files)
+# def get_model_version_detail(name: str, version: str) -> ModelInfo:
+#     model_version = model_registry_service.get_model_version_detail(name, version)
+#
+#     from aip.store.tracking_store import load_dict
+#     # config = load_dict(model_version.run_id, 'config.json')
+#     # model_info = load_dict(model_version.run_id, 'model_info.json')
+#     metadata = model_version.run.metadata
+#
+#     model_info = TrainingModelInfo(**metadata.get("model_info")) if "model_info" in metadata else None
+#     config = metadata.get("config") if "config" in metadata else None
+#     result = {
+#         "id": model_info.id,
+#         "name": model_info.name,
+#         "version": model_version.version,
+#         "tags": model_version.tags,
+#         "config": config,
+#         "train": {
+#             "params": model_version.run.data.params,
+#             "model_info": model_info
+#         }
+#     }
+#
+#     return ModelInfo(**result)
 
 
-def get_model_version_detail(name: str, version: str) -> ModelInfo:
-    model_version = model_registry_service.get_model_version_detail(name, version)
-
-    from aip.store.tracking_store import load_dict
-    # config = load_dict(model_version.run_id, 'config.json')
-    # model_info = load_dict(model_version.run_id, 'model_info.json')
-    metadata = model_version.run.metadata
-
-    model_info = TrainingModelInfo(**metadata.get("model_info")) if "model_info" in metadata else None
-    config = metadata.get("config") if "config" in metadata else None
-    result = {
-        "id": model_info.id,
-        "name": model_info.name,
-        "version": model_version.version,
-        "tags": model_version.tags,
-        "config": config,
-        "train": {
-            "params": model_version.run.data.params,
-            "model_info": model_info
-        }
-    }
-
-    return ModelInfo(**result)
-
-
-def search_model_versions(filter_string: Optional[str] = None) -> List[ModelVersion]:
+def search_model_versions(filter_string: Optional[str] = None) -> List[ModelInfo]:
     return model_registry_service.search_model_versions(filter_string)
 
 

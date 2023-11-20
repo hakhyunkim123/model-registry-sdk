@@ -9,7 +9,7 @@ from aip.exceptions import APIException
 from aip.constants import FINISHED
 from aip.entities.run import Run
 from aip.entities.experiment import Experiment
-from aip.entities.model_info import ModelInfo, TrainingModelInfo
+from aip.entities.model_info import ModelInfo
 from aip.entities.metric import Metric
 from aip.entities.param import Param
 from aip.utils.timeutils import get_current_time_millis
@@ -21,17 +21,17 @@ class Tracker:
     _run: Optional[Run] = None
     _experiment: Optional[Experiment] = None
     _configs: Optional[Dict[str, Any]] = None
-    _model_info: Optional[TrainingModelInfo] = None
+    _model_info: Optional[ModelInfo] = None
 
     def __init__(
             self,
-            tracker_type: str,
+            tracker_type: str = "BASE",
             configs: Optional[Dict[str, Any]] = None,
             model_info: Optional[Dict[str, Any]] = None
     ):
         self._type = tracker_type
         self._configs = configs
-        self._model_info = TrainingModelInfo(**model_info) if model_info is not None else None
+        self._model_info = ModelInfo(**model_info) if model_info is not None else None
 
     @property
     def type(self):
@@ -50,7 +50,7 @@ class Tracker:
         return self._configs
 
     @property
-    def model_info(self) -> TrainingModelInfo:
+    def model_info(self) -> ModelInfo:
         return self._model_info
 
     @model_info.setter
@@ -67,7 +67,6 @@ class Tracker:
         model_info = run.metadata.get("model_info", None)
         config = run.metadata.get("config", None)
         loaded_tracker = cls(
-            tracker_type=run.data.tags.get("type"),
             model_info=model_info,
             configs=config
         )
@@ -107,9 +106,6 @@ class Tracker:
                 tags=run_tags,
                 metadata=metadata
             )
-
-            # run = run.model_copy(update={"metadata": metadata})
-
         self._run = run
         return self._run
 
@@ -166,52 +162,6 @@ class Tracker:
         )
 
         return model_version
-
-    def log_model(self, name: str, metadata: Optional[Dict[str, Any]] = None):
-        # TODO
-        from mlflow.models import Model
-        mlflow_model = Model(
-            run_id=self._run.info.run_id,
-            artifact_path="model",
-            metadata=metadata
-        )
-
-        mlflow_model.save("MLmodel")
-
-        from mlflow.client import MlflowClient
-        mlflow_client = MlflowClient("http://localhost:5000")
-        mlflow_client.log_artifact (
-            self._run.info.run_id,
-            local_path="MLmodel",
-            artifact_path="model"
-        )
-
-        # if 'mlflow.log-model.history' in self.run.data.tags:
-        # self._mlflow_client.delete_tag(run_id, 'mlflow.log-model.history')
-        mlflow_client._record_logged_model(self._run.info.run_id, mlflow_model)
-
-        model = model_store.get_registered_model(name)
-        if model is None:
-            model = model_store.create_registered_model(name=name)
-
-        model_version = model_store.create_model_version(
-            name=name,
-            source=f"{self._run.info.artifact_uri}/model",
-            run_id=self._run.info.run_id
-            # tags=request.tags,
-            # description=request.description
-        )
-
-        # self._mlflow_client.transition_model_version_stage(
-        #     name=model_version.name,
-        #     version=model_version.version,
-        #     stage="Staging"
-        # )
-        # raise NotImplementedError
-
-    def register_model(self):
-        # TODO
-        raise NotImplementedError
 
     def refresh_run(self):
         ## IF RUN IS NONE ~~~ ##

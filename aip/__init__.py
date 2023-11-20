@@ -1,16 +1,19 @@
 from typing import Optional, Dict, Any, List
 
-from aip.tracking.trackers import (
-    Tracker
-)
+from aip.tracking.trackers import Tracker
+from aip.tracking.trackers.ncai_tracker import NCAITracker
+from aip.tracking.trackers.loader import TrackerLoader
+
 from aip.store.model_store import (
     get_registered_model,
+    search_registered_models,
     get_model_version,
-    get_model_version_detail
+    search_model_versions
 )
 from aip.store.tracking_store import (
     get_experiment,
     get_experiment_by_name,
+    search_experiments,
     get_run,
     get_run_detail,
     search_run
@@ -24,13 +27,21 @@ def create_tracker(
 ):
     if tracker_type == "SACP":
         return Tracker(
-            tracker_type=tracker_type,
+            configs=configs,
+            model_info=model_info
+        )
+    elif tracker_type == "NCAI":
+        return NCAITracker(
             configs=configs,
             model_info=model_info
         )
 
 
 def load_tracker(run_id: str):
-    return Tracker.load(run_id)
+    return TrackerLoader.load(run_id)
+
+
+def load_tracker_from_model(model):
+    return TrackerLoader.from_model(model)
 
 

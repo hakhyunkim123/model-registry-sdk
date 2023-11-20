@@ -28,46 +28,56 @@ def final():
         "auc": 0.85
     }
 
-    tracker = aip.create_tracker(tracker_type="SACP", model_info=model_info, configs=configs)
+    tracker = aip.create_tracker(tracker_type="NCAI", model_info=model_info, configs=configs)
 
-    experiment_tags = {
-        "type": "NCAI"
-    }
-
-    tracker.set_experiment(experiment_name="ncai_base_model", tags=experiment_tags)
+    tracker.set_experiment(experiment_name="test-ncai_base_model-11")
 
     run_tags = {
-        "type": "NCAI",
         "task_type": "NOTEBOOK",
         "task_id": "1234",
     }
-    tracker.start_run(run_name="test3", run_tags=run_tags)
+    tracker.start_run(run_name="test-01", run_tags=run_tags)
 
     tracker.log_params(params)
     tracker.log_metrics(metrics)
     # print(tracker.model_info)
-    # tracker.log_model_metadata()
+    tracker.log_model_metadata()
     # print(tracker.run.metadata)
 
     tracker.end()
 
 
-def get_model_version():
-    name = "고객 알뜰 지수"
-    model = aip.get_registered_model(name)
-    mv = model.latest_versions[0]
-    # print(mv)
-    from pprint import pprint
-    aip.get_model_version_detail(name=name, version="3")
+# def get_model_version():
+#     name = "고객 알뜰 지수"
+#     model = aip.get_registered_model(name)
+#     mv = model.latest_versions[0]
+#     # print(mv)
+#     from pprint import pprint
+#     aip.get_model_version(name=name, version="3")
 
 
 def load():
-    tracker = aip.load_tracker(run_id="34499753774e454c8177ebc38ff886ba")
-    tracker.log_model_metadata()
+    model = aip.get_model_version(name="P000001", version="3")
+    # tracker = aip.load_tracker(model.run_id)
+    # print(type(tracker))
+    tracker = aip.load_tracker_from_model(model)
+    # print(type(tracker))
+    # print(tracker.model_info)
+    # print(tracker.configs)
+    metrics = {
+        "metric_code_id": "M000001",
+        "metric_seq": "10",
+        "threshold": 0.7,
+        "numeric_value": 0.8,
+        "object_value": "test"
+    }
+    tracker.log_inference_metrics([metrics])
+    # tracker.log_model_metadata()
 # get_model_version()
-# final()
+final()
 # load()
 
 # print(aip.get_registered_model(name="P000001"))
 from pprint import pprint
-pprint(aip.get_model_version_detail(name="P000001", version="1").model_dump(), sort_dicts=False)
+pprint(aip.get_model_version(name="P000001", version="3", detail=True).model_dump(), sort_dicts=False)
+# pprint(aip.search_model_versions(filter_string="name='P000001'"))

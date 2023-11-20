@@ -13,8 +13,8 @@ class Metric(BaseModel):
 class NCAIMetric(BaseModel):
     metric_code_id: str
     metric_seq: str
-    threshold: Optional[float]
+    threshold: Optional[float] = Field(default=None)
     numeric_value: float
-    object_value: str
-    metric_cal_time: int = Field(default=get_current_time_millis())
-    data_jukja_dt: str
+    object_value: Optional[str] = Field(default=None)
+    metric_cal_time: Optional[str]
+    data_jukja_dt: Optional[str]
