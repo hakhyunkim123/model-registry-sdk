@@ -9,7 +9,7 @@ class TrackerLoader:
 
     @staticmethod
     def load(run_id: str):
-        run = get_run(run_id)
+        run = get_run(run_id, detail=False)
         tracker_type = run.data.tags.get("type", None)
 
         if tracker_type is None:
@@ -23,7 +23,7 @@ class TrackerLoader:
 
     @staticmethod
     def from_model(model: ModelInfo):
-        run = get_run(model.run_id)
+        run = get_run(model.run_id, detail=False)
         tracker_type = run.data.tags.get("type", None)
 
         if tracker_type is None:

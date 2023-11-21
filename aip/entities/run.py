@@ -3,26 +3,26 @@ from typing import Dict, List, Optional, Any
 
 
 class RunInfo(BaseModel):
-    experiment_id: str = Field(alias="experiment_id")
-    run_id: str = Field(alias="run_id")
-    run_name: str = Field(alias="run_name")
-    lifecycle_stage: str = Field(alias="lifecycle_stage")
-    artifact_uri: str = Field(alias="artifact_uri")
-    status: str = Field(alias="status")
-    user_id: str = Field(default=None, alias="user_id")
-    start_time: int = Field(default=None, alias="start_time")
-    end_time: Optional[int] = Field(default=None, alias="end_time")
+    experiment_id: str
+    run_id: str
+    run_name: str
+    lifecycle_stage: str
+    artifact_uri: str
+    status: str
+    user_id: str = Field(default=None)
+    start_time: int = Field(default=None)
+    end_time: Optional[int] = Field(default=None)
 
 
 class RunData(BaseModel):
-    metrics: Optional[Dict[str, float]] = Field(default=None, alias="metrics")
-    params: Optional[Dict[str, Any]] = Field(default=None, alias="params")
-    tags: Optional[Dict[str, str]] = Field(default=None, alias="tags")
+    metrics: Optional[Dict[str, float]] = Field(default={})
+    params: Optional[Dict[str, Any]] = Field(default={})
+    tags: Optional[Dict[str, str]] = Field(default={})
 
 
 class Run(BaseModel):
-    info: RunInfo = Field(default=None, alias="info")
-    data: RunData = Field(default=None, alias="data")
+    info: RunInfo
+    data: RunData
     metadata: Optional[Dict[str, Any]] = Field(default={})
     logged_model: Optional[Dict] = Field(default={})
     artifact_data: Optional[Dict[str, Any]] = Field(default={})

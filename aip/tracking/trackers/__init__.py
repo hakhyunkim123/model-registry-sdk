@@ -98,7 +98,7 @@ class Tracker:
             if self._configs is not None:
                 metadata['config'] = self._configs
             if self._model_info is not None:
-                metadata['model_info'] = self._model_info.model_dump()
+                metadata['model_info'] = self._model_info.model_dump(exclude_unset=True)
 
             run = tracking_store.create_run(
                 experiment_id=self._experiment.experiment_id,
@@ -139,7 +139,7 @@ class Tracker:
         model_tags = {
             "type": self._type,
             "name": self._model_info.name,
-            "model_code": self._model_info.id,
+            "eng_name": self._model_info.eng_name,
             "pdi_tag": self._model_info.pdi_tag,
             "category": self._model_info.category,
             "target": self._model_info.target,

@@ -7,7 +7,7 @@ from aip.store.tracking_store import log_dict
 from aip.utils.timeutils import conv_longdate_to_str, get_current_time_millis
 
 
-class NCAITracker(Tracker):
+class NCAITracker(SACPTracker):
 
     def __init__(self, configs: Optional[Dict[str, Any]] = None, model_info: Optional[Dict[str, Any]] = None):
         self._metrics: Dict = {}

@@ -23,4 +23,4 @@ class ModelVersion(BaseModel):
     creation_timestamp: Optional[int]
     last_updated_timestamp: Optional[int]
     metadata: Optional[Dict] = Field(default={})
-    run: Optional[Run] = Field(default={})
+    run: Optional[Run] = Field(default=None)

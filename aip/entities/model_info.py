@@ -1,23 +1,5 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional, List, Dict, Any
-
-
-# class TrainingModelInfo(BaseModel):
-#     id: str = Field(description="P000001")
-#     name: str = Field(description="고객 알뜰 지수")
-#     description: Optional[str] = Field(default=None, description="고객 알뜰 지수 입니다.")
-#     pdi_tag: str = Field(description="D")
-#     category: str = Field(description="상품단위")
-#     target: str = Field(description="신규")
-#     target_condition: Dict[str, Any] = Field(description='{"req1": "##"}')
-#     algorithm: str = Field(description="LGBM")
-#     ob_term: str = Field(description="24")
-#     complexity: str = Field(description="5/5")
-#     predict_term: str = Field(description="3")
-#     tvt_ratio: str = Field(description="7/2/1")
-#     active_yn: Optional[int] = Field(default=None, description="1")
-#     reg_time: Optional[int] = Field(default=None, description="202311061213")
-#     data_jukja_dt: Optional[int] = Field(default=None, description="20231106")
+from pydantic import BaseModel, Field
+from typing import Optional, Dict, Any
 
 
 class TrainingInfo(BaseModel):
@@ -33,6 +15,7 @@ class InferenceInfo(BaseModel):
 class ModelInfo(BaseModel):
     id: str = Field(description="P000001")
     name: str = Field(description="고객 알뜰 지수")
+    eng_name: Optional[str] = Field(default=None)
     version: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None, description="고객 알뜰 지수 입니다.")
     creation_time: Optional[str] = Field(default=None)
@@ -43,21 +26,19 @@ class ModelInfo(BaseModel):
     tags: Optional[Dict[str, Any]] = Field(default=None)
 
     config: Optional[Dict[str, Any]] = Field(default=None)
-
     train: Optional[TrainingInfo] = Field(default=None)
-
     inference: Optional[InferenceInfo] = Field(default=None)
 
     target_query: Optional[str] = Field(default=None)
-    pdi_tag: Optional[str] = Field(description="D")
-    category: Optional[str] = Field(description="상품단위")
-    target: Optional[str] = Field(description="신규")
-    target_condition: Optional[Dict[str, Any]] = Field(description='{"req1": "##"}')
-    algorithm: Optional[str] = Field(description="LGBM")
-    ob_term: Optional[str] = Field(description="24")
-    complexity: Optional[str] = Field(description="5/5")
-    predict_term: Optional[str] = Field(description="3")
-    tvt_ratio: Optional[str] = Field(description="7/2/1")
+    pdi_tag: Optional[str] = Field(default=None, description="D")
+    category: Optional[str] = Field(default=None, description="상품단위")
+    target: Optional[str] = Field(default=None, description="신규")
+    target_condition: Optional[str] = Field(default=None, description='{"req1": "##"}')
+    algorithm: Optional[str] = Field(default=None, description="LGBM")
+    ob_term: Optional[str] = Field(default=None, description="24")
+    complexity: Optional[str] = Field(default=None, description="5/5")
+    predict_term: Optional[str] = Field(default=None, description="3")
+    tvt_ratio: Optional[str] = Field(default=None, description="7/2/1")
     active_yn: Optional[int] = Field(default=None, description="1")
     reg_time: Optional[str] = Field(default=None, description="202311061213")
     data_jukja_dt: Optional[str] = Field(default=None, description="20231106")

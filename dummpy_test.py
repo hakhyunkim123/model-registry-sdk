@@ -57,13 +57,8 @@ def final():
 
 
 def load():
-    model = aip.get_model_version(name="P000001", version="3")
-    # tracker = aip.load_tracker(model.run_id)
-    # print(type(tracker))
+    model = aip.get_model_version(name="B000001", version="1")
     tracker = aip.load_tracker_from_model(model)
-    # print(type(tracker))
-    # print(tracker.model_info)
-    # print(tracker.configs)
     metrics = {
         "metric_code_id": "M000001",
         "metric_seq": "10",
@@ -72,12 +67,10 @@ def load():
         "object_value": "test"
     }
     tracker.log_inference_metrics([metrics])
-    # tracker.log_model_metadata()
+
 # get_model_version()
 final()
 # load()
-
-# print(aip.get_registered_model(name="P000001"))
-from pprint import pprint
-pprint(aip.get_model_version(name="P000001", version="3", detail=True).model_dump(), sort_dicts=False)
+# from pprint import pprint
+# pprint(aip.get_model_version(name="B000001", version="1", detail=True).model_dump(), sort_dicts=False)
 # pprint(aip.search_model_versions(filter_string="name='P000001'"))

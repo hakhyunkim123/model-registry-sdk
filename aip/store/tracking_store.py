@@ -162,13 +162,13 @@ def create_run(
     return _tracking_service.create_run(experiment_id=experiment_id, run_name=run_name, tags=tags, metadata=metadata)
 
 
-def get_run(run_id: str) -> Run:
+def get_run(run_id: str, detail: bool = True) -> Run:
     """
     Get run by run id
     :param run_id: run id
     :return: Run
     """
-    run = _tracking_service.get_run(run_id=run_id)
+    run = _tracking_service.get_run(run_id=run_id, detail=detail)
     # artifact_uri = run.info.artifact_uri
     # run_dict = run.model_dump()
     # del run

@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from aip.utils.timeutils import get_current_time_millis
 
 
 class Metric(BaseModel):

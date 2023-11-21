@@ -94,31 +94,6 @@ def get_model_version(name: str, version: str, detail: bool = False) -> ModelInf
     return model_registry_service.get_model_version(name, version, detail)
 
 
-# def get_model_version_detail(name: str, version: str) -> ModelInfo:
-#     model_version = model_registry_service.get_model_version_detail(name, version)
-#
-#     from aip.store.tracking_store import load_dict
-#     # config = load_dict(model_version.run_id, 'config.json')
-#     # model_info = load_dict(model_version.run_id, 'model_info.json')
-#     metadata = model_version.run.metadata
-#
-#     model_info = TrainingModelInfo(**metadata.get("model_info")) if "model_info" in metadata else None
-#     config = metadata.get("config") if "config" in metadata else None
-#     result = {
-#         "id": model_info.id,
-#         "name": model_info.name,
-#         "version": model_version.version,
-#         "tags": model_version.tags,
-#         "config": config,
-#         "train": {
-#             "params": model_version.run.data.params,
-#             "model_info": model_info
-#         }
-#     }
-#
-#     return ModelInfo(**result)
-
-
 def search_model_versions(filter_string: Optional[str] = None) -> List[ModelInfo]:
     return model_registry_service.search_model_versions(filter_string)
 
