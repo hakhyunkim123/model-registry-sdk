@@ -2,20 +2,22 @@ from typing import Optional, Dict, Any, List
 
 from aip.tracking.trackers import Tracker
 from aip.tracking.trackers.ncai_tracker import NCAITracker
+from aip.tracking.trackers.sacp_tracker import SACPTracker
 from aip.tracking.trackers.loader import TrackerLoader
 
 from aip.store.model_store import (
     get_registered_model,
     search_registered_models,
     get_model_version,
-    search_model_versions
+    search_model_versions,
+    get_latest_model_version,
+    get_retrain_history
 )
 from aip.store.tracking_store import (
     get_experiment,
     get_experiment_by_name,
     search_experiments,
     get_run,
-    get_run_detail,
     search_run
 )
 
@@ -26,7 +28,7 @@ def create_tracker(
         model_info: Dict[str, Any] = None
 ):
     if tracker_type == "SACP":
-        return Tracker(
+        return SACPTracker(
             configs=configs,
             model_info=model_info
         )

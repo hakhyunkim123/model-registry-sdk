@@ -1,7 +1,6 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseSettings, Field
 
 
 class AuthConfig(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix='AIP_')
-    username: str
-    password: str
+    username: str = Field(env="AIP_USERNAME")
+    password: str = Field(env="AIP_PASSWORD")

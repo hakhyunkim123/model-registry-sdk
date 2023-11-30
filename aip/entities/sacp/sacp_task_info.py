@@ -1,12 +1,14 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, Field
+from pydantic import BaseSettings, Field
 
 
 class SACPTaskInfo(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="TASK_")
+    task_id: str = Field(env="TASK_TASK_ID")
+    pod_name: str = Field(env="TASK_POD_NAME")
+    task_type: str = Field(env="TASK_TYPE")
+    project_id: str = Field(env="PROJECT_ID")
+    current_user: str = Field(env="AICENTRO_CURRENT_USER")
 
-    task_id: str
-    pod_name: str
-    task_type: str = Field(alias="TASK_TYPE")
-    project_id: str = Field(alias="PROJECT_ID")
-    current_user: str = Field(alias="AICENTRO_CURRENT_USER")
+
+    # def to_dict(self):
+    #     return {
+    #     }

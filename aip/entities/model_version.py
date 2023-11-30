@@ -1,26 +1,24 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional, List, Dict, Any
-from aip.entities.run import Run
+from pydantic import BaseModel, Field
+from typing import Optional, Dict, Any
+from aip.entities.model_info import ModelInfo
+
+
+class ModelVersionStage:
+    STAGE_NONE = "None"
+    STAGE_STAGING = "Staging"
+    STAGE_PRODUCTION = "Production"
+    STAGE_ARCHIVED = "Archived"
 
 
 class ModelVersion(BaseModel):
-    model_config = ConfigDict(
-        protected_namespaces=()
-    )
-
-    model_uuid: Optional[str] = Field(default=None)
     name: str
-    version: str
-    run_id: Optional[str] = Field(default=None)
-    source: str
+    version: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
-    tags: Optional[Dict] = Field(default=None)
-    current_stage: Optional[str]
-    status_message: Optional[str] = Field(default=None)
+    stage: Optional[str] = Field(default=None)
     status: Optional[str] = Field(default=None)
-    run_link: Optional[str] = Field(default=None)
-    aliases: Optional[List[Dict]] = Field(default=[])
-    creation_timestamp: Optional[int]
-    last_updated_timestamp: Optional[int]
-    metadata: Optional[Dict] = Field(default={})
-    run: Optional[Run] = Field(default=None)
+    run_id: Optional[str] = Field(default=None)
+    source: Optional[str] = Field(default=None)
+    tags: Optional[Dict[str, Any]] = Field(default=None)
+    creation_timestamp: int
+    last_updated_timestamp: int
+    info: Optional[ModelInfo] = Field(default=None)

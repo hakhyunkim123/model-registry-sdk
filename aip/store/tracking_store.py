@@ -169,26 +169,6 @@ def get_run(run_id: str, detail: bool = True) -> Run:
     :return: Run
     """
     run = _tracking_service.get_run(run_id=run_id, detail=detail)
-    # artifact_uri = run.info.artifact_uri
-    # run_dict = run.model_dump()
-    # del run
-    # if artifact_files is not None:
-    #     run_dict['artifact_data'] = dict()
-    #     for artifact_file in artifact_files:
-    #         data = _tracking_service.load_dict(f"{artifact_uri}/{artifact_file}.json")
-    #         run_dict['artifact_data'][artifact_file] = data
-
-    return run
-
-
-def get_run_detail(run_id: str, artifact_files: Optional[List[str]] = None) -> Run:
-    """
-    Get run by run id
-    :param artifact_files:
-    :param run_id: run id
-    :return: Run
-    """
-    run = _tracking_service.get_run_detail(run_id, artifact_files)
 
     return run
 
@@ -196,6 +176,7 @@ def get_run_detail(run_id: str, artifact_files: Optional[List[str]] = None) -> R
 def search_run(
         experiment_id: str,
         filter_string: str = None,
+        detail: bool = False
 ) -> List[Run]:
     """
     Search run using filter option
@@ -203,7 +184,7 @@ def search_run(
     :param filter_string: filter string option (example: filter_string = "run_name = 'iris-01'"
     :return: List[Run], next_page_token
     """
-    return _tracking_service.search_run(experiment_id=experiment_id, filter_string=filter_string)
+    return _tracking_service.search_run(experiment_id=experiment_id, filter_string=filter_string, detail=detail)
 
 # def search_run(
 #         experiment_ids: List[str],
@@ -233,30 +214,29 @@ def get_run_by_name(experiment_id: str, run_name: str, detail: bool = False) -> 
     :param run_name: run name
     :return: Run
     """
-    runs = search_run(experiment_id=experiment_id, filter_string=f"run_name = '{run_name}'")
+    runs = search_run(experiment_id=experiment_id, filter_string=f"run_name = '{run_name}'", detail=detail)
     if len(runs) == 0:
         return None
     run = runs[-1]
     if detail:
-        run = get_run_detail(run.info.run_id)
+        run = get_run(run.info.run_id, detail=True)
     return run
 
 
-# def update_run(
-#         run_id: str,
-#         status: Optional[str] = None,
-#         end_time: Optional[int] = get_current_time_millis(),
-#         run_name: Optional[str] = None
-# ) -> RunInfo:
-#     """
-#     Update run status, end time or name
-#     :param run_id: run id to update
-#     :param status: RUNNING, FINISHED, ...
-#     :param end_time: end time of run
-#     :param run_name: new name of run
-#     :return: None
-#     """
-#     return _tracking_service.update_run(run_id, status, end_time, run_name)
+def update_run(
+        run_id: str,
+        status: Optional[str] = None,
+        name: Optional[str] = None
+) -> None:
+    """
+    Update run status, end time or name
+    :param run_id: run id to update
+    :param status: RUNNING, FINISHED, ...
+    :param end_time: end time of run
+    :param run_name: new name of run
+    :return: None
+    """
+    return _tracking_service.update_run(run_id, status, name)
 
 
 def set_tag(run_id: str, key: str, value: Any) -> None:
@@ -280,8 +260,8 @@ def delete_tag(run_id: str, key: str) -> None:
     _tracking_service.delete_tag(run_id, key)
 
 
-def load_dict(run_id: str, artifact_path: str) -> Dict:
-    return _tracking_service.load_dict(run_id, artifact_path)
+# def load_dict(run_id: str, artifact_path: str) -> Dict:
+#     return _tracking_service.load_dict(run_id, artifact_path)
 
 
 def log_dict(run_id: str, dictionary: Dict[str, Any], artifact_file: str, experiment_id: str = None) -> None:
@@ -293,14 +273,14 @@ def log_batch(
         params: Optional[Dict[str, Any]] = None,
         metrics: Optional[Dict[str, float]] = None,
         tags: Optional[Dict[str, str]] = None,
-        experiment_id: str = None
+        experiment_id: Optional[str] = None
 ) -> None:
     _tracking_service.log_batch(
         run_id, params, metrics, tags, experiment_id
     )
 
 
-def log_param(run_id: str, key: str, value: Any) -> None:
+def log_param(run_id: str, key: str, value: Any, experiment_id: Optional[str] = None) -> None:
     """
     log parameter
     :param run_id: run id
@@ -308,18 +288,20 @@ def log_param(run_id: str, key: str, value: Any) -> None:
     :param value: parameter value
     :return: None
     """
-    _tracking_service.log_param(run_id, key, value)
+    _tracking_service.log_param(run_id, key, value, experiment_id)
 
 
 def log_metric(
         run_id: str,
         key: str,
         value: float,
-        timestamp: Optional[int] = get_current_time_millis(),
-        step: Optional[int] = None
+        timestamp: Optional[int] = None,
+        step: Optional[int] = 0,
+        experiment_id: Optional[str] = None
 ) -> None:
     """
     Log metric variable
+    :param experiment_id:
     :param run_id: run id
     :param key: metric key
     :param value: metric value
@@ -327,12 +309,14 @@ def log_metric(
     :param step: step
     :return: None
     """
-    _tracking_service.log_metric(run_id, key, value, timestamp, step)
+    _tracking_service.log_metric(run_id, key, value, timestamp, step, experiment_id)
 
 
 def log_params(run_id: str, params: Dict[str, Any], experiment_id: str = None) -> None:
     """
     log parameter
+    :param experiment_id:
+    :param params:
     :param run_id: run id
     :param key: parameter key
     :param value: parameter value

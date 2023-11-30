@@ -8,6 +8,12 @@ os.environ["AIP_PASSWORD"] = "new1234!"
 os.environ["MLFLOW_TRACKING_USERNAME"] = "admin"
 os.environ["MLFLOW_TRACKING_PASSWORD"] = "new1234!"
 
+os.environ["TASK_TASK_ID"] = "12345"
+os.environ["TASK_POD_NAME"] = "sample-pod-name"
+os.environ["TASK_TYPE"] = "NOTEBOOK"
+os.environ["PROJECT_ID"] = "asdfd12a"
+os.environ["AICENTRO_CURRENT_USER"] = "admin"
+
 
 def final():
     with open("model_info.yaml", encoding="utf-8") as f:
@@ -36,11 +42,11 @@ def final():
         "task_type": "NOTEBOOK",
         "task_id": "1234",
     }
-    tracker.start_run(run_name="test-01", run_tags=run_tags)
+    tracker.start_run(run_name="s3-test-32", run_tags=run_tags)
 
-    tracker.log_params(params)
-    tracker.log_metrics(metrics)
-    # print(tracker.model_info)
+    # tracker.log_params(params)
+    # tracker.log_metrics(metrics)
+    # # print(tracker.model_info)
     tracker.log_model_metadata()
     # print(tracker.run.metadata)
 
@@ -69,8 +75,10 @@ def load():
     tracker.log_inference_metrics([metrics])
 
 # get_model_version()
-final()
+# final()
 # load()
-# from pprint import pprint
-# pprint(aip.get_model_version(name="B000001", version="1", detail=True).model_dump(), sort_dicts=False)
+from pprint import pprint
+# pprint(aip.get_model_version(name="T000001", version="1", detail=True).model_dump(), sort_dicts=False)
+pprint(aip.get_latest_model_version(name="T000001").model_dump(), sort_dicts=False)
+# pprint(aip.search_model_versions())
 # pprint(aip.search_model_versions(filter_string="name='P000001'"))

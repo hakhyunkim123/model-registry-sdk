@@ -2,14 +2,14 @@ from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
 
 
-class TrainingInfo(BaseModel):
-    params: Optional[Dict] = Field(default=None)
-    metrics: Optional[Dict] = Field(default=None)
-    tags: Optional[Dict] = Field(default=None)
-
-
-class InferenceInfo(BaseModel):
-    metrics: Optional[Dict] = Field(default=None)
+# class TrainingInfo(BaseModel):
+#     params: Optional[Dict] = Field(default=None)
+#     metrics: Optional[Dict] = Field(default=None)
+#     tags: Optional[Dict] = Field(default=None)
+#
+#
+# class InferenceInfo(BaseModel):
+#     metrics: Optional[Dict] = Field(default=None)
 
 
 class ModelInfo(BaseModel):
@@ -26,8 +26,8 @@ class ModelInfo(BaseModel):
     tags: Optional[Dict[str, Any]] = Field(default=None)
 
     config: Optional[Dict[str, Any]] = Field(default=None)
-    train: Optional[TrainingInfo] = Field(default=None)
-    inference: Optional[InferenceInfo] = Field(default=None)
+    # train: Optional[TrainingInfo] = Field(default=None)
+    # inference: Optional[InferenceInfo] = Field(default=None)
 
     target_query: Optional[str] = Field(default=None)
     pdi_tag: Optional[str] = Field(default=None, description="D")

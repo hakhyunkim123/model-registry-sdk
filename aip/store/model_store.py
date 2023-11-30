@@ -1,9 +1,9 @@
 from typing import Optional, List, Dict, Any, Tuple
 
 import aip._internal._model_regisry_service as model_registry_service
-from aip.entities.model_info import ModelInfo
-from aip.entities.model import RegisteredModel
+from aip.entities.registered_model import RegisteredModel
 from aip.entities.model_version import ModelVersion
+from aip.entities.retrain_info import RetrainInfo
 from aip.exceptions import APIException
 
 
@@ -40,9 +40,10 @@ def search_registered_models(filter_string: Optional[str] = None,) -> List[Regis
 
 def get_latest_model_version(
         name: str,
-        stages: Optional[List[str]] = None
-) -> List[ModelVersion]:
-    return model_registry_service.get_latest_model_version(name, stages)
+        stages: Optional[List[str]] = None,
+        detail: bool = True
+) -> ModelVersion:
+    return model_registry_service.get_latest_model_version(name, stages, detail)
 
 
 def update_registered_model(name: str, description: Optional[str] = None) -> RegisteredModel:
@@ -79,23 +80,29 @@ def create_model_version(
         run_id: Optional[str] = None,
         tags: Optional[Dict[str, Any]] = None,
         # run_link: Optional[str] = None,
-        description: Optional[str] = None
-) -> ModelInfo:
+        description: Optional[str] = None,
+        vertica_insert: bool = True
+) -> ModelVersion:
     return model_registry_service.create_model_version(
         name=name,
         source=source,
         run_id=run_id,
         tags=tags,
-        description=description
+        description=description,
+        vertica_insert=vertica_insert
     )
 
 
-def get_model_version(name: str, version: str, detail: bool = False) -> ModelInfo:
+def get_model_version(name: str, version: str, detail: bool = False) -> ModelVersion:
     return model_registry_service.get_model_version(name, version, detail)
 
 
-def search_model_versions(filter_string: Optional[str] = None) -> List[ModelInfo]:
-    return model_registry_service.search_model_versions(filter_string)
+def get_retrain_history(name: str, version: str) -> List[RetrainInfo]:
+    return model_registry_service.get_retrain_history(name, version)
+
+
+def search_model_versions(filter_string: Optional[str] = None, detail: bool = False) -> List[ModelVersion]:
+    return model_registry_service.search_model_versions(filter_string, detail)
 
 
 # def search_model_versions(
@@ -133,9 +140,9 @@ def delete_model_version_tag(name: str, version: str = None, key: str = None) ->
 
 
 def transition_model_version_stage(
-        name: str, version: str, stage
+        name: str, version: str, stage, vertica_update: bool = False
 ) -> ModelVersion:
-    return model_registry_service.transition_model_version_stage(name, version, stage)
+    return model_registry_service.transition_model_version_stage(name, version, stage, vertica_update)
 
 
 def delete_model_version(name: str, version: str) -> None:

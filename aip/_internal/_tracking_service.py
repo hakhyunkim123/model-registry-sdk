@@ -46,42 +46,14 @@ def get_experiment_by_name(experiment_name: str) -> Optional[Experiment]:
         return Experiment(**experiment) if experiment is not None else None
 
 
-def search_experiments(
-        filter_string: Optional[str] = None
-) -> List[Experiment]:
-    url = f"{EXPERIMENT_DOMAIN}/search"
-
-    data = dict()
-    if filter_string is not None:
-        data['filter_string'] = filter_string
-
-    response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
-
-    if response.status_code != 200:
-        raise APIException(response)
-    else:
-        experiments = response.json().get("experiments", [])
-        return [Experiment(**experiment) for experiment in experiments]
-
-
 # def search_experiments(
-#         view_type: int = ACTIVE_ONLY,
-#         max_results: int = 1000,
-#         filter_string: Optional[str] = None,
-#         order_by: Optional[List[str]] = None,
-#         page_token: Optional[str] = None
-# ) -> Tuple[List[Experiment], str]:
+#         filter_string: Optional[str] = None
+# ) -> List[Experiment]:
 #     url = f"{EXPERIMENT_DOMAIN}/search"
 #
 #     data = dict()
-#     data['view_type'] = view_type
-#     data['max_results'] = max_results
 #     if filter_string is not None:
-#         data['filter'] = filter_string
-#     if order_by is not None:
-#         data['order_by'] = order_by
-#     if page_token is not None:
-#         data['page_token'] = page_token
+#         data['filter_string'] = filter_string
 #
 #     response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
 #
@@ -89,8 +61,37 @@ def search_experiments(
 #         raise APIException(response)
 #     else:
 #         experiments = response.json().get("experiments", [])
-#         next_page_token = response.json().get("next_page_token", None)
-#         return [Experiment(**experiment) for experiment in experiments], next_page_token
+#         return [Experiment(**experiment) for experiment in experiments]
+
+
+def search_experiments(
+        view_type: int = ACTIVE_ONLY,
+        max_results: int = 1000,
+        filter_string: Optional[str] = None,
+        order_by: Optional[List[str]] = None,
+        page_token: Optional[str] = None
+) -> List[Experiment]: #-> Tuple[List[Experiment], str]:
+    url = f"{EXPERIMENT_DOMAIN}/search"
+
+    data = dict()
+    data['view_type'] = view_type
+    data['max_results'] = max_results
+    if filter_string is not None:
+        data['filter'] = filter_string
+    if order_by is not None:
+        data['order_by'] = order_by
+    if page_token is not None:
+        data['page_token'] = page_token
+
+    response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
+
+    if response.status_code != 200:
+        raise APIException(response)
+    else:
+        experiments = response.json().get("experiments", [])
+        # next_page_token = response.json().get("next_page_token", None)
+        return [Experiment(**experiment) for experiment in experiments]
+        # return [Experiment(**experiment) for experiment in experiments], next_page_token
 
 
 def set_experiment_tag(experiment_id: str, key: str, value: str) -> None:
@@ -187,34 +188,48 @@ def get_run(run_id: str, detail: bool = False) -> Run:
         return Run(**response.json().get("run"))
 
 
-def get_run_detail(run_id: str, artifact_files: Optional[List[str]] = None) -> Run:
-    url = f"{RUN_DOMAIN}/detail"
-
-    if artifact_files is None:
-        artifact_files = []
-
-    data = dict()
-    data['run_id'] = run_id
-    data['artifact_files'] = artifact_files
-
-    response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
-
-    if response.status_code != 200:
-        raise APIException(response)
-    else:
-        return Run(**response.json().get("run"))
+# def search_run(
+#         experiment_id: str,
+#         filter_string: str = None
+# ) -> List[Run]:
+#     url = f"{RUN_DOMAIN}/search"
+#
+#     data = dict()
+#     data['experiment_id'] = experiment_id
+#     if filter_string is not None:
+#         data['filter_string'] = filter_string
+#
+#     response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
+#
+#     if response.status_code != 200:
+#         raise APIException(response)
+#     else:
+#         runs = response.json().get("runs", [])
+#         return [Run(**run) for run in runs]
 
 
 def search_run(
         experiment_id: str,
-        filter_string: str = None
-) -> List[Run]:
+        filter_string: str = None,
+        run_view_type: int = ACTIVE_ONLY,
+        max_results: int = 1000,
+        order_by: Optional[List[str]] = None,
+        page_token: Optional[str] = None,
+        detail: bool = False
+) -> List[Run]: #-> Tuple[List[Run], str]:
     url = f"{RUN_DOMAIN}/search"
 
     data = dict()
     data['experiment_id'] = experiment_id
+    data['run_view_type'] = run_view_type
+    data['max_results'] = max_results
     if filter_string is not None:
         data['filter_string'] = filter_string
+    if order_by is not None:
+        data['order_by'] = order_by
+    if page_token is not None:
+        data['page_token'] = page_token
+    data['detail'] = detail
 
     response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
 
@@ -222,7 +237,9 @@ def search_run(
         raise APIException(response)
     else:
         runs = response.json().get("runs", [])
+        # next_page_token = response.json().get("next_page_token", None)
         return [Run(**run) for run in runs]
+        # return [Run(**run) for run in runs], next_page_token
 
 
 def list_artifacts(run_id: str, path: Optional[str] = None) -> List[str]:
@@ -271,74 +288,39 @@ def delete_tag(run_id: str, key: str, experiment_id: Optional[str] = None) -> No
     if response.status_code != 200:
         raise APIException(response)
 
-# def search_run(
-#         experiment_ids: List[str],
-#         filter_string: str = None,
-#         run_view_type: int = ACTIVE_ONLY,
-#         max_results: int = 1000,
-#         order_by: Optional[List[str]] = None,
-#         page_token: Optional[str] = None
-# ) -> Tuple[List[Run], str]:
-#     url = f"{RUN_DOMAIN}/search"
-#
-#     data = dict()
-#     data['experiment_ids'] = experiment_ids
-#     data['run_view_type'] = run_view_type
-#     data['max_results'] = max_results
-#     if filter_string is not None:
-#         data['filter'] = filter_string
-#     if order_by is not None:
-#         data['order_by'] = order_by
-#     if page_token is not None:
-#         data['page_token'] = page_token
-#
-#     response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
-#
-#     if response.status_code != 200:
-#         raise APIException(response)
-#     else:
-#         runs = response.json().get("runs", [])
-#         next_page_token = response.json().get("next_page_token", None)
-#         return [Run(**run) for run in runs], next_page_token
 
-
-# def update_run(
-#         run_id: str,
-#         status: Optional[str] = None,
-#         end_time: Optional[int] = None,
-#         run_name: Optional[str] = None
-# ) -> RunInfo:
-#     url = f"{RUN_DOMAIN}/update"
-#
-#     data = dict()
-#     data['run_id'] = run_id
-#     if status is not None:
-#         data['status'] = status
-#     if end_time is not None:
-#         data['end_time'] = end_time
-#     if run_name is not None:
-#         data['run_name'] = run_name
-#
-#     response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
-#
-#     if response.status_code != 200:
-#         raise APIException(response)
-#     else:
-#         return RunInfo(**response.json().get("run_info"))
-
-def load_dict(run_id: str, artifact_path: str) -> Dict:
-    url = f"{RUN_DOMAIN}/load-dict"
+def update_run(
+        run_id: str,
+        status: Optional[str] = None,
+        name: Optional[str] = None
+) -> None:
+    url = f"{RUN_DOMAIN}"
 
     data = dict()
     data['run_id'] = run_id
-    data['artifact_path'] = artifact_path
+    if status is not None:
+        data['status'] = status
+    if name is not None:
+        data['name'] = name
 
-    response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
+    response = requests.patch(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
 
     if response.status_code != 200:
         raise APIException(response)
-    else:
-        return response.json().get("data")
+
+# def load_dict(run_id: str, artifact_path: str) -> Dict:
+#     url = f"{RUN_DOMAIN}/load-dict"
+#
+#     data = dict()
+#     data['run_id'] = run_id
+#     data['artifact_path'] = artifact_path
+#
+#     response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
+#
+#     if response.status_code != 200:
+#         raise APIException(response)
+#     else:
+#         return response.json().get("data")
 
 
 def log_dict(run_id: str, dictionary: Dict[str, Any], artifact_file: str, experiment_id: str = None) -> None:
@@ -383,12 +365,56 @@ def log_batch(
         raise APIException(response)
 
 
-def log_params(run_id: str, params: Dict[str, Any], experiment_id: str = None) -> None:
+def log_param(run_id: str, key: str, value: Any, experiment_id: str = None) -> None:
+    url = f"{RUN_DOMAIN}/log-param"
+
+    data = dict()
+    data['run_id'] = run_id
+    data['key'] = key
+    data['value'] = value
+    if experiment_id is not None:
+        data['experiment_id'] = experiment_id
+
+    response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
+
+    if response.status_code != 200:
+        raise APIException(response)
+
+
+def log_params(run_id: str, params: Dict[str, Any], experiment_id: Optional[str] = None) -> None:
     url = f"{RUN_DOMAIN}/log-params"
 
     data = dict()
     data['run_id'] = run_id
     data['params'] = params
+    if experiment_id is not None:
+        data['experiment_id'] = experiment_id
+
+    response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
+
+    if response.status_code != 200:
+        raise APIException(response)
+
+
+def log_metric(
+        run_id: str,
+        key: str,
+        value: float,
+        timestamp: Optional[int] = None,
+        step: Optional[int] = 0,
+        experiment_id: Optional[str] = None
+) -> None:
+    url = f"{RUN_DOMAIN}/log-metric"
+
+    if timestamp is None:
+        timestamp = get_current_time_millis()
+
+    data = dict()
+    data['run_id'] = run_id
+    data['key'] = key
+    data['value'] = value
+    data['timestamp'] = timestamp
+    data['step'] = step
     if experiment_id is not None:
         data['experiment_id'] = experiment_id
 

@@ -24,11 +24,11 @@ class SACPTracker(Tracker):
             run_name = self._task_info.task_id
 
         sacp_run_tags = {
-            "task_id": self._task_info.task_id,
-            "pod_name": self._task_info.pod_name,
-            "task_type": self._task_info.task_type,
-            "project_id": self._task_info.project_id,
-            "current_user": self._task_info.current_user,
+            "sacp.task_id": self._task_info.task_id,
+            "sacp.pod_name": self._task_info.pod_name,
+            "sacp.task_type": self._task_info.task_type,
+            "sacp.project_id": self._task_info.project_id,
+            "sacp.current_user": self._task_info.current_user,
         }
 
         if run_tags is None:

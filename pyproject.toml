@@ -1,22 +1,21 @@
 [tool.poetry]
 name = "model-registry-sdk"
-version = "0.1.0"
+version = "0.1.0"x
 description = ""
 authors = ["hyun24436@gmail.com <hyun24436@gmail.com>"]
 readme = "README.md"
 packages = [{include = "model_registry_sdk"}]
 
 [tool.poetry.dependencies]
-python = "^3.8"
 pytz = "^2023.3.post1"
 requests = "^2.31.0"
-pydantic = "^2.4.2"
-mlflow = "^2.8.0"
-boto3 = "^1.28.74"
+pydantic = "^1.9.2"
+#mlflow = "^2.8.0"
+#boto3 = "^1.28.74"
 bentoml = "^1.1.7"
-xgboost = "^2.0.1"
-fs-s3fs = "^1.1.1"
-pydantic-settings = "^2.0.3"
+#xgboost = "^2.0.1"
+#fs-s3fs = "^1.1.1"
+#pydantic-settings = "^2.0.3"
 
 
 [build-system]

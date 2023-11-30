@@ -1,15 +1,14 @@
-id: "B000001"
+id: "T000004"
 name: "고객 알뜰 지수 모델"
+eng_name: "WM_1_NEW"
 description: "고객 알뜰 지수 모델 입니다."
 version:
 pdi_tag: "D"
 category: "상품단위"
 target: "신규"
-target_condition:
-  "req1": "##"
+target_condition: "req:1234"
 algorithm: "LGBM"
 ob_term: "24"
 complexity: "5/5"
 predict_term: "3"
 tvt_ratio: "7/2/1"
-active_yn: 1

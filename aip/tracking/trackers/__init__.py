@@ -1,5 +1,3 @@
-from abc import ABCMeta
-
 from typing import Optional, List, Dict, Any, Tuple
 
 import aip.store.model_store as model_store
@@ -13,7 +11,6 @@ from aip.entities.model_info import ModelInfo
 from aip.entities.metric import Metric
 from aip.entities.param import Param
 from aip.utils.timeutils import get_current_time_millis
-from aip.auth import AuthConfig
 
 
 class Tracker:
@@ -61,17 +58,26 @@ class Tracker:
     def configs(self, configs):
         self._configs = configs
 
+    @run.setter
+    def run(self, run: Run):
+        self._run = run
+
+    @experiment.setter
+    def experiment(self, experiment: Experiment):
+        self._experiment = experiment
+
     @classmethod
     def load(cls, run_id: str):
-        run = tracking_store.get_run_detail(run_id)
+        run = tracking_store.get_run(run_id, detail=True)
         model_info = run.metadata.get("model_info", None)
         config = run.metadata.get("config", None)
+
         loaded_tracker = cls(
             model_info=model_info,
             configs=config
         )
-        loaded_tracker.set_experiment(tracking_store.get_experiment(run.info.experiment_id).name)
-        loaded_tracker.start_run(run.info.run_name)
+        loaded_tracker.experiment = tracking_store.get_experiment(run.info.experiment_id)
+        loaded_tracker.run = run
 
         return loaded_tracker
 
@@ -98,7 +104,7 @@ class Tracker:
             if self._configs is not None:
                 metadata['config'] = self._configs
             if self._model_info is not None:
-                metadata['model_info'] = self._model_info.model_dump(exclude_unset=True)
+                metadata['model_info'] = self._model_info.dict(exclude_unset=True)
 
             run = tracking_store.create_run(
                 experiment_id=self._experiment.experiment_id,
@@ -112,7 +118,10 @@ class Tracker:
     def set_tag(self, key: str, value: str):
         tracking_store.set_tag(self._run.info.run_id, key, value)
 
-    def delete_tag(self, key:str):
+    def update_run(self, status: Optional[str] = None, name: Optional[str] = None) -> None:
+        tracking_store.update_run(self._run.info.run_id, status=status, name=name)
+
+    def delete_tag(self, key: str):
         tracking_store.delete_tag(self._run.info.run_id, key)
 
     def log_param(self, key: str, value: Any):
@@ -121,44 +130,44 @@ class Tracker:
     def log_params(self, params: Dict[str, Any]):
         tracking_store.log_params(self._run.info.run_id, params, self._experiment.experiment_id)
 
-    def log_metric(self, key: str, value: float, timestamp: Optional[int] = get_current_time_millis(), step: Optional[int] = None):
+    def log_metric(self, key: str, value: float, timestamp: Optional[int] = None, step: Optional[int] = None):
+        if timestamp is None:
+            timestamp = get_current_time_millis()
         tracking_store.log_metric(self._run.info.run_id, key, value, timestamp, step)
 
     def log_metrics(self, metrics: Dict[str, float], step: Optional[int] = None):
         tracking_store.log_metrics(self._run.info.run_id, metrics, self._experiment.experiment_id)
 
-    def log_model_metadata(self):
-        model_metadata = {'model_code': self._model_info.id}
+    def log_model_metadata(self, tags: Optional[Dict[str, Any]] = None, vertica_insert: bool = True):
         tracking_store.log_model_metadata(
             run_id=self._run.info.run_id,
             model_name=self._model_info.name,
-            metadata=model_metadata,
             experiment_id=self._experiment.experiment_id
         )
 
-        model_tags = {
+        if tags is None:
+            tags = {}
+        tags.update({
             "type": self._type,
-            "name": self._model_info.name,
-            "eng_name": self._model_info.eng_name,
-            "pdi_tag": self._model_info.pdi_tag,
-            "category": self._model_info.category,
-            "target": self._model_info.target,
-            "algorithm": self._model_info.algorithm
-        }
+            "name": f"{self._model_info.name}",
+        })
 
-        registered_model = model_store.get_registered_model(name=self._model_info.id)
+        registered_model_name = self._model_info.id
+
+        registered_model = model_store.get_registered_model(name=registered_model_name)
         if registered_model is None:
             registered_model = model_store.create_registered_model(
-                name=self._model_info.id,
-                tags=model_tags,
+                name=registered_model_name,
+                tags=tags,
                 description=self._model_info.description
             )
 
         model_version = model_store.create_model_version(
             name=registered_model.name,
             run_id=self._run.info.run_id,
-            tags=model_tags,
-            description=self._model_info.description
+            tags=tags,
+            description=self._model_info.description,
+            vertica_insert=vertica_insert
         )
 
         return model_version

@@ -1,5 +1,21 @@
 from pydantic import BaseModel, Field
 from typing import Dict, List, Optional, Any
+# from mlflow.entities.run_status import RunStatus
+
+
+class RunStatus:
+    RUNNING = "RUNNING"
+    SCHEDULED = "SCHEDULED"
+    FINISHED = "FINISHED"
+    FAILED = "FAILED"
+    KILLED = "KILLED"
+
+
+class RunType:
+    BASE = "BASE"
+    TRAIN = "TRAIN"
+    RETRAIN = "RETRAIN"
+    SERVING = "SERVING"
 
 
 class RunInfo(BaseModel):
