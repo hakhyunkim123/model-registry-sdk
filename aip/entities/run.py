@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Dict, List, Optional, Any
+from aip.entities.metric import NCAIMetric
 # from mlflow.entities.run_status import RunStatus
 
 
@@ -31,8 +32,9 @@ class RunInfo(BaseModel):
 
 
 class RunData(BaseModel):
-    metrics: Optional[Dict[str, float]] = Field(default={})
     params: Optional[Dict[str, Any]] = Field(default={})
+    metrics: Optional[Dict[str, float]] = Field(default={})
+    ncai_metrics: Optional[List[NCAIMetric]] = Field(default=[])
     tags: Optional[Dict[str, str]] = Field(default={})
 
 

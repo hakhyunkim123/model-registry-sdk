@@ -2,20 +2,10 @@ from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
 
 
-# class TrainingInfo(BaseModel):
-#     params: Optional[Dict] = Field(default=None)
-#     metrics: Optional[Dict] = Field(default=None)
-#     tags: Optional[Dict] = Field(default=None)
-#
-#
-# class InferenceInfo(BaseModel):
-#     metrics: Optional[Dict] = Field(default=None)
-
-
 class ModelInfo(BaseModel):
+    # Mlflow ModelVersion data
     id: str = Field(description="P000001")
     name: str = Field(description="고객 알뜰 지수")
-    eng_name: Optional[str] = Field(default=None)
     version: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None, description="고객 알뜰 지수 입니다.")
     creation_time: Optional[str] = Field(default=None)
@@ -25,10 +15,11 @@ class ModelInfo(BaseModel):
     source: Optional[str] = Field(default=None)
     tags: Optional[Dict[str, Any]] = Field(default=None)
 
+    # Config Data
     config: Optional[Dict[str, Any]] = Field(default=None, repr=False)
-    # train: Optional[TrainingInfo] = Field(default=None)
-    # inference: Optional[InferenceInfo] = Field(default=None)
 
+    # Table ModelInfo Data
+    eng_name: Optional[str] = Field(default=None)
     target_query: Optional[str] = Field(default=None, repr=False)
     pdi_tag: Optional[str] = Field(default=None, description="D")
     category: Optional[str] = Field(default=None, description="상품단위")

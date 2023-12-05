@@ -9,6 +9,7 @@ from aip.entities.run import RunType
 from aip.entities.tracker import TrackerType
 
 from aip import load_tracker_from_model
+from aip.store.tracking_store import get_run, get_experiment
 from aip.store.model_store import get_model_version, get_latest_model_version, get_retrain_history
 
 
@@ -33,6 +34,11 @@ class Model:
 
     @classmethod
     def from_model_version(cls, model_version: ModelVersion):
+        """
+        Constructor using ModelVersion
+        :param model_version: ModelVersion
+        :return: cls
+        """
         return cls(
             name=model_version.name,
             version=model_version.version,
@@ -41,27 +47,48 @@ class Model:
 
     @classmethod
     def latest_version(cls, name: str):
+        """
+        Get Class using ModelVersion's name
+        :param name: ModelVersion name
+        :return: cls
+        """
         model_version = get_latest_model_version(name=name, detail=True)
         return cls.from_model_version(model_version)
 
     def get_tracker(self):
+        """
+        Get Tracker of model
+        :return: Tracker
+        """
         return load_tracker_from_model(self.info)
 
     def get_retrain_history(self) -> List[RetrainInfo]:
+        """
+        Get model's retrain history
+        :return: List of Retrain information
+        """
         return get_retrain_history(name=self.name, version=self.version)
 
     def start_retrain_tracker(self, run_name: Optional[str] = None):
-        parent_run = self._model_version.run_id
+        """
+        Start retrain tracker
+        :param run_name: Retrain tracker's run name
+        :return: Tracker
+        """
+        parent_run = get_run(run_id=self._model_version.run_id)
+        parent_run_id = parent_run.info.run_id
+        experiment_name = get_experiment(experiment_id=parent_run.info.experiment_id).name
+
         tracker = aip.create_tracker(
             tracker_type=self._model_version.tags.get("type")
         )
-        tracker.set_experiment(experiment_name=self.name)
+        tracker.set_experiment(experiment_name=experiment_name)
 
         if run_name is None:
             run_name = f"{self.name}/{self.version}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
         run_tags = {
-            "mlflow.parentRunId": parent_run,
+            "mlflow.parentRunId": parent_run_id,
             "type": TrackerType.NCAI,
             "run_type": RunType.RETRAIN,
             "model_id": self.name,

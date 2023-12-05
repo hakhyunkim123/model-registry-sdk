@@ -15,5 +15,5 @@ class NCAIMetric(BaseModel):
     threshold: Optional[float] = Field(default=None)
     numeric_value: float
     object_value: Optional[str] = Field(default=None)
-    metric_cal_time: Optional[str]
-    data_jukja_dt: Optional[str]
+    metric_cal_time: Optional[str] = Field(default=None)
+    data_jukja_dt: Optional[str] = Field(default=None)
