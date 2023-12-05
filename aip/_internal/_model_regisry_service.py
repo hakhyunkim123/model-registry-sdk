@@ -1,5 +1,5 @@
 import requests
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Optional, List, Dict, Any
 
 from aip.auth import AuthConfig
 from aip.entities.registered_model import RegisteredModel

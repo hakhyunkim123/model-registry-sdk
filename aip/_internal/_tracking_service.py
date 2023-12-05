@@ -3,6 +3,7 @@ from typing import Optional, List, Dict, Any, Tuple
 
 from aip.entities.run import Run, RunInfo, RunData
 from aip.entities.experiment import Experiment
+from aip.entities.metric import NCAIMetric
 from aip.exceptions import APIException
 from aip.constants import EXPERIMENT_DOMAIN, RUN_DOMAIN, ACTIVE_ONLY, ALL
 from aip.utils.timeutils import get_current_time_millis, conv_longdate_to_str
@@ -432,6 +433,23 @@ def log_metrics(run_id: str, metrics: Dict[str, Any], experiment_id: str = None)
     data['metrics'] = metrics
     if experiment_id is not None:
         data['experiment_id'] = experiment_id
+
+    response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
+
+    if response.status_code != 200:
+        raise APIException(response)
+
+
+def log_ncai_metrics(run_id: str, metrics: List[Dict],
+                     experiment_id: str = None, vertica_insert: bool = False) -> None:
+    url = f"{RUN_DOMAIN}/log-ncai-metrics"
+
+    data = dict()
+    data['run_id'] = run_id
+    data['metrics'] = metrics
+    if experiment_id is not None:
+        data['experiment_id'] = experiment_id
+    data['vertica_insert'] = vertica_insert
 
     response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
 

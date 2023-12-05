@@ -19,6 +19,8 @@ class Tracker:
     _experiment: Optional[Experiment] = None
     _configs: Optional[Dict[str, Any]] = None
     _model_info: Optional[ModelInfo] = None
+    _params: Optional[Dict] = None
+    _metrics: Optional[Dict] = None
 
     def __init__(
             self,
@@ -29,6 +31,8 @@ class Tracker:
         self._type = tracker_type
         self._configs = configs
         self._model_info = ModelInfo(**model_info) if model_info is not None else None
+        self._params = dict()
+        self._metrics = dict()
 
     @property
     def type(self):

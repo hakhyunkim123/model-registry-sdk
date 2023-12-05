@@ -18,7 +18,7 @@ class ModelVersion(BaseModel):
     status: Optional[str] = Field(default=None)
     run_id: Optional[str] = Field(default=None)
     source: Optional[str] = Field(default=None)
-    tags: Optional[Dict[str, Any]] = Field(default=None)
+    tags: Optional[Dict[str, Any]] = Field(default=None, repr=False)
     creation_timestamp: int
     last_updated_timestamp: int
     info: Optional[ModelInfo] = Field(default=None)

@@ -3,7 +3,7 @@ from typing import Optional, Any, List, Dict
 from aip.tracking.trackers.sacp_tracker import SACPTracker
 from aip.tracking.trackers import Tracker
 from aip.entities.metric import NCAIMetric
-from aip.store.tracking_store import log_dict
+from aip.store.tracking_store import log_ncai_metrics, log_dict
 from aip.utils.timeutils import conv_longdate_to_str, get_current_time_millis
 
 
@@ -12,9 +12,11 @@ class NCAITracker(SACPTracker):
     def __init__(self, configs: Optional[Dict[str, Any]] = None, model_info: Optional[Dict[str, Any]] = None):
         super().__init__(tracker_type="NCAI", model_info=model_info, configs=configs)
 
-    def log_ncai_metrics(self, metrics: List[Dict]):
+    def log_ncai_metrics(self, metrics: List[Dict], vertica_insert: bool = False):
         ncai_metrics = [NCAIMetric(**metric) for metric in metrics]
-        log_dict(self.run.info.run_id, {"metrics": metrics}, f"metadata/metrics.json")
+        log_ncai_metrics(run_id=self.run.info.run_id, metrics=metrics,
+                         experiment_id=self.experiment.experiment_id, vertica_insert=vertica_insert)
+        # log_dict(self.run.info.run_id, {"metrics": metrics}, f"metadata/metrics.json")
 
     # def log_inference_metrics(self, metrics: List[Dict]):
     #     current_time = get_current_time_millis()

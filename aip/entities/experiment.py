@@ -7,6 +7,6 @@ class Experiment(BaseModel):
     name: str
     artifact_location: str
     lifecycle_stage: str
-    tags: Optional[Dict[str, str]] = Field(default={})
+    tags: Optional[Dict[str, str]] = Field(default={}, repr=False)
     creation_time: int
     last_update_time: int

@@ -1,3 +1,8 @@
+import os
+api_root_domain = os.environ.get("API_ROOT_DOMAIN", None)
+if api_root_domain is None:
+    os.environ["API_ROOT_DOMAIN"] = "http://mlops.arcapi.shinhan.com"
+
 from typing import Optional, Dict, Any, List
 
 from aip.tracking.trackers import Tracker
@@ -11,7 +16,9 @@ from aip.store.model_store import (
     get_model_version,
     search_model_versions,
     get_latest_model_version,
-    get_retrain_history
+    get_retrain_history,
+    set_model_version_tag,
+    transition_model_version_stage
 )
 from aip.store.tracking_store import (
     get_experiment,

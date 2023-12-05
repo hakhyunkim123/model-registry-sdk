@@ -5,6 +5,7 @@ import aip._internal._tracking_service as _tracking_service
 
 from aip.entities.run import Run, RunInfo, RunData
 from aip.entities.experiment import Experiment
+from aip.entities.metric import NCAIMetric
 from aip.exceptions import APIException
 from aip.constants import EXPERIMENT_DOMAIN, RUN_DOMAIN, ACTIVE_ONLY, ALL
 
@@ -334,6 +335,19 @@ def log_metrics(run_id: str, metrics: Dict[str, Any], experiment_id: str = None)
     :return: None
     """
     _tracking_service.log_metrics(run_id, metrics, experiment_id)
+
+
+def log_ncai_metrics(run_id: str, metrics: List[Dict],
+                     experiment_id: str = None, vertica_insert: bool = False) -> None:
+    """
+    log parameter
+    :param run_id: run id
+    :param key: parameter key
+    :param value: parameter value
+    :return: None
+    """
+    _tracking_service.log_ncai_metrics(run_id=run_id, metrics=metrics,
+                                       experiment_id=experiment_id, vertica_insert=vertica_insert)
 
 
 def log_model_metadata(

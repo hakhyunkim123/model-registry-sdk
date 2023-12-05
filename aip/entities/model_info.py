@@ -25,15 +25,15 @@ class ModelInfo(BaseModel):
     source: Optional[str] = Field(default=None)
     tags: Optional[Dict[str, Any]] = Field(default=None)
 
-    config: Optional[Dict[str, Any]] = Field(default=None)
+    config: Optional[Dict[str, Any]] = Field(default=None, repr=False)
     # train: Optional[TrainingInfo] = Field(default=None)
     # inference: Optional[InferenceInfo] = Field(default=None)
 
-    target_query: Optional[str] = Field(default=None)
+    target_query: Optional[str] = Field(default=None, repr=False)
     pdi_tag: Optional[str] = Field(default=None, description="D")
     category: Optional[str] = Field(default=None, description="상품단위")
     target: Optional[str] = Field(default=None, description="신규")
-    target_condition: Optional[str] = Field(default=None, description='{"req1": "##"}')
+    target_condition: Optional[str] = Field(default=None, description='{"req1": "##"}', repr=False)
     algorithm: Optional[str] = Field(default=None, description="LGBM")
     ob_term: Optional[str] = Field(default=None, description="24")
     complexity: Optional[str] = Field(default=None, description="5/5")

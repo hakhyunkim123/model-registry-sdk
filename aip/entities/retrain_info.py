@@ -10,7 +10,7 @@ class RetrainInfo(BaseModel):
     creation_time: int
     params: Optional[Dict[str, Any]] = Field(default={})
     metrics: Optional[Dict[str, float]] = Field(default={})
-    ncai_metrics: Optional[List[NCAIMetric]] = Field(default=[])
+    ncai_metrics: Optional[List[NCAIMetric]] = Field(default=[], repr=False)
 
 
 class RetrainHistory(BaseModel):

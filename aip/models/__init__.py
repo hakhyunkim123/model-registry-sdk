@@ -28,6 +28,9 @@ class Model:
             self._model_version = get_model_version(model_version.name, model_version.version, detail=True)
         self.info = self._model_version.info
 
+    def __repr__(self):
+        return f"Model(name={self.name}, version={self.version})"
+
     @classmethod
     def from_model_version(cls, model_version: ModelVersion):
         return cls(
