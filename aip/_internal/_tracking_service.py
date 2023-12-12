@@ -189,43 +189,22 @@ def get_run(run_id: str, detail: bool = False) -> Run:
         return Run(**response.json().get("run"))
 
 
-# def search_run(
-#         experiment_id: str,
-#         filter_string: str = None
-# ) -> List[Run]:
-#     url = f"{RUN_DOMAIN}/search"
-#
-#     data = dict()
-#     data['experiment_id'] = experiment_id
-#     if filter_string is not None:
-#         data['filter_string'] = filter_string
-#
-#     response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
-#
-#     if response.status_code != 200:
-#         raise APIException(response)
-#     else:
-#         runs = response.json().get("runs", [])
-#         return [Run(**run) for run in runs]
-
-
 def search_run(
         experiment_id: str,
-        filter_string: str = None,
+        filter_string: str = "",
         run_view_type: int = ACTIVE_ONLY,
         max_results: int = 1000,
         order_by: Optional[List[str]] = None,
         page_token: Optional[str] = None,
         detail: bool = False
-) -> List[Run]: #-> Tuple[List[Run], str]:
+) -> Tuple[List[Run], Optional[str]]:
     url = f"{RUN_DOMAIN}/search"
 
     data = dict()
     data['experiment_id'] = experiment_id
     data['run_view_type'] = run_view_type
     data['max_results'] = max_results
-    if filter_string is not None:
-        data['filter_string'] = filter_string
+    data['filter_string'] = filter_string
     if order_by is not None:
         data['order_by'] = order_by
     if page_token is not None:
@@ -238,9 +217,8 @@ def search_run(
         raise APIException(response)
     else:
         runs = response.json().get("runs", [])
-        # next_page_token = response.json().get("next_page_token", None)
-        return [Run(**run) for run in runs]
-        # return [Run(**run) for run in runs], next_page_token
+        next_page_token = response.json().get("next_page_token", None)
+        return [Run(**run) for run in runs], next_page_token
 
 
 def list_artifacts(run_id: str, path: Optional[str] = None) -> List[str]:

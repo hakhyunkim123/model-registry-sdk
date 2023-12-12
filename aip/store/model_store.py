@@ -26,7 +26,7 @@ def get_registered_model(name: str) -> Optional[RegisteredModel]:
     return model
 
 
-def search_registered_models(filter_string: Optional[str] = None,) -> List[RegisteredModel]:
+def search_registered_models(filter_string: Optional[str] = None) -> List[RegisteredModel]:
     return model_registry_service.search_registered_models(filter_string)
 
 # def search_registered_models(
@@ -79,7 +79,6 @@ def create_model_version(
         source: Optional[str] = None,
         run_id: Optional[str] = None,
         tags: Optional[Dict[str, Any]] = None,
-        # run_link: Optional[str] = None,
         description: Optional[str] = None,
         vertica_insert: bool = True
 ) -> ModelVersion:
@@ -101,17 +100,24 @@ def get_retrain_history(name: str, version: str) -> List[RetrainInfo]:
     return model_registry_service.get_retrain_history(name, version)
 
 
-def search_model_versions(filter_string: Optional[str] = None, detail: bool = False) -> List[ModelVersion]:
-    return model_registry_service.search_model_versions(filter_string, detail)
+# def search_model_versions(filter_string: Optional[str] = None, detail: bool = False) -> List[ModelVersion]:
+#     return model_registry_service.search_model_versions(filter_string, detail)
 
 
-# def search_model_versions(
-#         filter_string: Optional[str] = None,
-#         max_results: int = 1000,
-#         order_by: Optional[List[str]] = None,
-#         page_token: Optional[str] = None,
-# ) -> Tuple[List[ModelVersion], str]:
-#     return search_model_versions(filter_string, max_results, order_by, page_token)
+def search_model_versions(
+        filter_string: str = "",
+        max_results: int = 10000,
+        order_by: Optional[List[str]] = None,
+        page_token: Optional[str] = None,
+        detail: bool = True
+) -> Tuple[List[ModelVersion], str]:
+    return model_registry_service.search_model_versions(
+        filter_string=filter_string,
+        max_results=max_results,
+        order_by=order_by,
+        page_token=page_token,
+        detail=detail
+    )
 
 
 def get_model_version_by_alias(name: str, alias: str) -> ModelVersion:

@@ -1,13 +1,11 @@
-from typing import Optional, Dict, Any, List, Tuple
-from aip.utils.timeutils import get_current_time_millis
+from typing import Optional, Dict, Any, Tuple, List
 
 import aip._internal._tracking_service as _tracking_service
-
-from aip.entities.run import Run, RunInfo, RunData
+from aip.entities.run import Run
 from aip.entities.experiment import Experiment
-from aip.entities.metric import NCAIMetric
+from aip.constants import ACTIVE_ONLY
 from aip.exceptions import APIException
-from aip.constants import EXPERIMENT_DOMAIN, RUN_DOMAIN, ACTIVE_ONLY, ALL
+from aip.utils.timeutils import get_current_time_millis
 
 
 def create_experiment(name: str, tags: Optional[Dict[str, Any]] = None) -> Experiment:
@@ -174,38 +172,52 @@ def get_run(run_id: str, detail: bool = True) -> Run:
     return run
 
 
+# def search_run(
+#         experiment_id: str,
+#         filter_string: str = "",
+#         run_view_type: int = AC,
+#         max_results: int = SEARCH_MAX_RESULTS_DEFAULT,
+#         order_by: Optional[List[str]] = None,
+#         page_token: Optional[str] = None,
+#         detail: bool = False
+# ) -> List[Run]:
+#     """
+#     Search run using filter option
+#     :param experiment_id: list of experiment id to search
+#     :param filter_string: filter string option (example: filter_string = "run_name = 'iris-01'"
+#     :return: List[Run], next_page_token
+#     """
+#     return _tracking_service.search_run(experiment_id=experiment_id, filter_string=filter_string, detail=detail)
+
 def search_run(
         experiment_id: str,
-        filter_string: str = None,
+        filter_string: str = "",
+        run_view_type: int = ACTIVE_ONLY,
+        max_results: int = 1000,
+        order_by: Optional[List[str]] = None,
+        page_token: Optional[str] = None,
         detail: bool = False
-) -> List[Run]:
+) -> Tuple[List[Run], str]:
     """
     Search run using filter option
     :param experiment_id: list of experiment id to search
     :param filter_string: filter string option (example: filter_string = "run_name = 'iris-01'"
+    :param run_view_type: default: ACTIVE_ONLY otherwise DELETED_ONLY, ALL
+    :param max_results :max result count. default is 1000 (for paging)
+    :param order_by: order by option
+    :param page_token: page token for pagination
     :return: List[Run], next_page_token
+    :param detail: If detail is True, return metadata additionally
     """
-    return _tracking_service.search_run(experiment_id=experiment_id, filter_string=filter_string, detail=detail)
-
-# def search_run(
-#         experiment_ids: List[str],
-#         filter_string: str = None,
-#         run_view_type: int = ACTIVE_ONLY,
-#         max_results: int = 1000,
-#         order_by: Optional[List[str]] = None,
-#         page_token: Optional[str] = None
-# ) -> Tuple[List[Run], str]:
-#     """
-#     Search run using filter option
-#     :param experiment_ids: list of experiment id to search
-#     :param filter_string: filter string option (example: filter_string = "run_name = 'iris-01'"
-#     :param run_view_type: default: ACTIVE_ONLY otherwise DELETED_ONLY, ALL
-#     :param max_results :max result count. default is 1000 (for paging)
-#     :param order_by: order by option
-#     :param page_token: page token for pagination
-#     :return: List[Run], next_page_token
-#     """
-#     return _tracking_service.search_run(experiment_ids, filter_string, run_view_type, max_results, order_by, page_token)
+    return _tracking_service.search_run(
+        experiment_id=experiment_id,
+        filter_string=filter_string,
+        run_view_type=run_view_type,
+        max_results=max_results,
+        order_by=order_by,
+        page_token=page_token,
+        detail=detail
+    )
 
 
 def get_run_by_name(experiment_id: str, run_name: str, detail: bool = False) -> Optional[Run]:
@@ -215,7 +227,7 @@ def get_run_by_name(experiment_id: str, run_name: str, detail: bool = False) -> 
     :param run_name: run name
     :return: Run
     """
-    runs = search_run(experiment_id=experiment_id, filter_string=f"run_name = '{run_name}'", detail=detail)
+    runs, _ = search_run(experiment_id=experiment_id, filter_string=f"run_name = '{run_name}'", detail=detail)
     if len(runs) == 0:
         return None
     run = runs[-1]

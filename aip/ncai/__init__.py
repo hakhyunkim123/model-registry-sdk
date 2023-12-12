@@ -1,5 +1,6 @@
-from typing import Dict, Any
+from typing import Union, Dict, Any
 from datetime import datetime
+from pandas import DataFrame
 
 from aip.entities.tracker import TrackerType
 from aip.entities.run import RunType
@@ -11,7 +12,7 @@ from aip.store.model_store import transition_model_version_stage
 
 
 def register_basemodel(
-        model_info: Dict[str, Any],
+        model_info: Union[Dict[str, Any], DataFrame],
         configs: Dict[str, Any],
         model_stage: str = ModelVersionStage.STAGE_NONE,
         vertica_insert: bool = False
@@ -48,7 +49,11 @@ def register_basemodel(
     tracker.update_run(name=f"{model_version.name}/{model_version.version}")
 
     if vertica_insert:
-        transition_model_version_stage(name=model_version.name, version=model_version.version,
-                                       stage=model_stage, vertica_update=vertica_insert)
+        transition_model_version_stage(
+            name=model_version.name,
+            version=model_version.version,
+            stage=model_stage,
+            vertica_update=vertica_insert
+        )
 
     return model_version

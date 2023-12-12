@@ -1,5 +1,5 @@
 import requests
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 
 from aip.auth import AuthConfig
 from aip.entities.registered_model import RegisteredModel
@@ -84,7 +84,6 @@ def get_latest_model_version(
         raise APIException(response)
     else:
         return ModelVersion(**response.json().get("model_version"))
-        # return [ModelVersion(**model_version) for model_version in response.json().get("model_versions")]
 
 
 def set_registered_model_tag(name: str, key: str, value: Any) -> None:
@@ -177,25 +176,25 @@ def get_retrain_history(name: str, version: str) -> List[RetrainInfo]:
         raise APIException(response)
     else:
         return [RetrainInfo(**retrain_info) for retrain_info in response.json().get("retrain_history")]
-        # return RetrainInfo(**response.json().get("retrain_history"))
 
 
 def search_model_versions(
-        filter_string: Optional[str] = None,
-        max_results: int = 1000,
+        filter_string: str = "",
+        max_results: int = 10000,
         order_by: Optional[List[str]] = None,
         page_token: Optional[str] = None,
-) -> List[ModelVersion]: #-> Tuple[List[ModelInfo], str]:
+        detail: bool = False
+) -> Tuple[List[ModelVersion], str]:
     url = f"{MODEL_VERSION_DOMAIN}/search"
 
     data = dict()
+    data['filter_string'] = filter_string
     data['max_results'] = max_results
-    if filter_string is not None:
-        data['filter'] = filter_string
     if order_by is not None:
         data['order_by'] = order_by
     if page_token is not None:
         data['page_token'] = page_token
+    data['detail'] = detail
 
     response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
 
@@ -203,9 +202,8 @@ def search_model_versions(
         raise APIException(response)
     else:
         model_versions = response.json().get("model_versions", [])
-        # next_page_token = response.json().get("next_page_token", None)
-        return [ModelVersion(**model_version) for model_version in model_versions]
-        # return [ModelInfo(**model_version) for model_version in model_versions], next_page_token
+        next_page_token = response.json().get("next_page_token", None)
+        return [ModelVersion(**model_version) for model_version in model_versions], next_page_token
 
 
 def get_model_version_download_uri(name: str, version: str) -> str:

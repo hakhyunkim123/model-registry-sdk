@@ -46,13 +46,14 @@ class Model:
         )
 
     @classmethod
-    def latest_version(cls, name: str):
+    def latest_version(cls, name: str, detail: bool = True):
         """
         Get Class using ModelVersion's name
         :param name: ModelVersion name
+        :param detail: If detail get ModelVersion Detail(model info metadata)
         :return: cls
         """
-        model_version = get_latest_model_version(name=name, detail=True)
+        model_version = get_latest_model_version(name=name, detail=detail)
         return cls.from_model_version(model_version)
 
     def get_tracker(self):
@@ -93,7 +94,7 @@ class Model:
             "run_type": RunType.RETRAIN,
             "model_id": self.name,
             "model_version": self.version,
-            "dw_juka_dt": ""
+            "dw_jukja_dt": ""
         }
 
         tracker.start_run(run_name=run_name, run_tags=run_tags)

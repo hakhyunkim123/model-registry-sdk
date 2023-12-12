@@ -1,4 +1,7 @@
-from typing import Optional, Any, List, Dict
+from typing import Union, Optional, Any, List, Dict
+
+import pandas as pd
+from pandas import DataFrame
 
 from aip.tracking.trackers.sacp_tracker import SACPTracker
 from aip.tracking.trackers import Tracker
@@ -12,7 +15,9 @@ class NCAITracker(SACPTracker):
     def __init__(self, configs: Optional[Dict[str, Any]] = None, model_info: Optional[Dict[str, Any]] = None):
         super().__init__(tracker_type="NCAI", model_info=model_info, configs=configs)
 
-    def log_ncai_metrics(self, metrics: List[Dict], vertica_insert: bool = False):
+    def log_ncai_metrics(self, metrics: Union[List[Dict], DataFrame], vertica_insert: bool = False):
+        if isinstance(metrics, DataFrame):
+            metrics = metrics.astype(object).where(pd.notnull(metrics), None)
         ncai_metrics = [NCAIMetric(**metric) for metric in metrics]
         log_ncai_metrics(run_id=self.run.info.run_id, metrics=metrics,
                          experiment_id=self.experiment.experiment_id, vertica_insert=vertica_insert)
