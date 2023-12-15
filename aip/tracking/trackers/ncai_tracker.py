@@ -17,9 +17,15 @@ class NCAITracker(SACPTracker):
 
     def log_ncai_metrics(self, metrics: Union[List[Dict], DataFrame], vertica_insert: bool = False):
         if isinstance(metrics, DataFrame):
-            metrics = metrics.astype(object).where(pd.notnull(metrics), None)
-        ncai_metrics = [NCAIMetric(**metric) for metric in metrics]
-        log_ncai_metrics(run_id=self.run.info.run_id, metrics=metrics,
+            metrics = metrics.astype(object).where(pd.notnull(metrics), None).to_dict('records')
+
+        lowercase_metrics = list()
+        for metric in metrics:
+            lowercase_metric = {k.lower(): v for k, v in metric.items()}
+            lowercase_metrics.append(lowercase_metric)
+
+        ncai_metrics = [NCAIMetric(**metric) for metric in lowercase_metrics]
+        log_ncai_metrics(run_id=self.run.info.run_id, metrics=lowercase_metrics,
                          experiment_id=self.experiment.experiment_id, vertica_insert=vertica_insert)
         # log_dict(self.run.info.run_id, {"metrics": metrics}, f"metadata/metrics.json")
 

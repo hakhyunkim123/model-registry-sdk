@@ -70,7 +70,7 @@ def get_latest_model_version(
         stages: Optional[List[str]] = None,
         detail: bool = True
 ) -> ModelVersion:
-    url = f"{REGISTERED_MODEL_DOMAIN}/get-latest-versions"
+    url = f"{REGISTERED_MODEL_DOMAIN}/get-latest-version"
 
     data = dict()
     data["name"] = name
@@ -84,6 +84,28 @@ def get_latest_model_version(
         raise APIException(response)
     else:
         return ModelVersion(**response.json().get("model_version"))
+
+
+def get_latest_model_versions(
+        name: str,
+        stages: Optional[List[str]] = None,
+        detail: bool = True
+) -> List[ModelVersion]:
+    url = f"{REGISTERED_MODEL_DOMAIN}/get-latest-versions"
+
+    data = dict()
+    data["name"] = name
+    if stages is not None:
+        data["stages"] = stages
+    data['detail'] = detail
+
+    response = requests.post(url, json=data, auth=(AuthConfig().username, AuthConfig().password))
+
+    if response.status_code != 200:
+        raise APIException(response)
+    else:
+        model_versions = response.json().get("model_versions")
+        return [ModelVersion(**model_version) for model_version in model_versions]
 
 
 def set_registered_model_tag(name: str, key: str, value: Any) -> None:

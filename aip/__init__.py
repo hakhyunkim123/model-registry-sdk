@@ -16,6 +16,7 @@ from aip.store.model_store import (
     get_model_version,
     search_model_versions,
     get_latest_model_version,
+    get_latest_model_versions,
     get_retrain_history,
     set_model_version_tag,
     transition_model_version_stage

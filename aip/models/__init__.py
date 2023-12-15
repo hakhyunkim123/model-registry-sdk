@@ -46,14 +46,15 @@ class Model:
         )
 
     @classmethod
-    def latest_version(cls, name: str, detail: bool = True):
+    def latest_version(cls, name: str, stages: Optional[List[str]] = None, detail: bool = True):
         """
         Get Class using ModelVersion's name
         :param name: ModelVersion name
+        :param stages: ModelVersion stage list to search: None, Staging, Production, Archived
         :param detail: If detail get ModelVersion Detail(model info metadata)
         :return: cls
         """
-        model_version = get_latest_model_version(name=name, detail=detail)
+        model_version = get_latest_model_version(name=name, stages=stages, detail=detail)
         return cls.from_model_version(model_version)
 
     def get_tracker(self):

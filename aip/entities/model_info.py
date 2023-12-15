@@ -4,22 +4,11 @@ from typing import Optional, Dict, Any
 
 
 class ModelInfo(BaseModel):
-    # Mlflow ModelVersion data
+    # Table ModelInfo Data
     id: str = Field(description="P000001")
     name: str = Field(description="고객 알뜰 지수")
     version: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None, description="고객 알뜰 지수 입니다.")
-    creation_time: Optional[str] = Field(default=None)
-    stage: Optional[str] = Field(default=None)
-    status: Optional[str] = Field(default=None)
-    run_id: Optional[str] = Field(default=None)
-    source: Optional[str] = Field(default=None)
-    tags: Optional[Dict[str, Any]] = Field(default=None)
-
-    # Config Data
-    config: Optional[Dict[str, Any]] = Field(default=None, repr=False)
-
-    # Table ModelInfo Data
     eng_name: Optional[str] = Field(default=None)
     target_query: Optional[str] = Field(default=None, repr=False)
     pdi_tag: Optional[str] = Field(default=None, description="D")
@@ -34,6 +23,9 @@ class ModelInfo(BaseModel):
     active_yn: Optional[int] = Field(default=None, description="1")
     reg_time: Optional[str] = Field(default=None, description="202311061213")
     data_jukja_dt: Optional[str] = Field(default=None, description="20231106")
+
+    # Config Data
+    config: Optional[Dict[str, Any]] = Field(default=None, repr=False)
 
     @classmethod
     def from_vertica_entity(cls, data) -> "ModelInfo":

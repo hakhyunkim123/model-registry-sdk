@@ -14,7 +14,7 @@ class ModelVersion(BaseModel):
     name: str
     version: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
-    stage: Optional[str] = Field(default=None)
+    current_stage: Optional[str] = Field(default=None)
     status: Optional[str] = Field(default=None)
     run_id: Optional[str] = Field(default=None)
     source: Optional[str] = Field(default=None)

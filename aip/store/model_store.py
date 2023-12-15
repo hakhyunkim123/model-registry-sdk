@@ -46,6 +46,14 @@ def get_latest_model_version(
     return model_registry_service.get_latest_model_version(name, stages, detail)
 
 
+def get_latest_model_versions(
+        name: str,
+        stages: Optional[List[str]] = None,
+        detail: bool = True
+) -> List[ModelVersion]:
+    return model_registry_service.get_latest_model_versions(name, stages, detail)
+
+
 def update_registered_model(name: str, description: Optional[str] = None) -> RegisteredModel:
     raise NotImplementedError
 
